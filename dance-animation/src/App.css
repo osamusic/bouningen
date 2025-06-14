@@ -160,3 +160,452 @@ main {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   max-width: 100%;
 }
+
+.speed-control {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.speed-control label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.speed-slider-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.speed-slider-container span {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  min-width: 30px;
+}
+
+.speed-slider {
+  width: 200px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #4ade80;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.speed-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #22c55e;
+}
+
+.speed-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #4ade80;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.speed-value {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.controls-container {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .controls-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.figure-control {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: center;
+  flex: 1;
+}
+
+.figure-control label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.figure-slider-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.figure-slider-container span {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  min-width: 30px;
+}
+
+.figure-slider {
+  width: 200px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.figure-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #60a5fa;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.figure-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #3b82f6;
+}
+
+.figure-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #60a5fa;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.figure-value {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.speed-control {
+  flex: 1;
+}
+
+.sync-control {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: center;
+  flex: 1;
+}
+
+.sync-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.sync-checkbox {
+  display: none;
+}
+
+.sync-slider {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+}
+
+.sync-slider::before {
+  content: '';
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  background: white;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sync-checkbox:checked + .sync-slider {
+  background: #10b981;
+}
+
+.sync-checkbox:checked + .sync-slider::before {
+  transform: translateX(30px);
+}
+
+.sync-text {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.sync-description {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+
+.personality-control {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.personality-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.personality-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.reset-btn {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.reset-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.personality-sliders {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.personality-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.personality-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+}
+
+.personality-icon {
+  font-size: 1.2rem;
+}
+
+.personality-name {
+  flex: 1;
+  margin-left: 0.5rem;
+}
+
+.personality-value {
+  font-weight: 600;
+  min-width: 40px;
+  text-align: right;
+}
+
+.personality-slider {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.personality-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--slider-color, #60a5fa);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.personality-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.personality-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--slider-color, #60a5fa);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.personality-total {
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.canvas-container canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Control Panel for Dark Mode */
+.control-panel {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: center;
+  flex: 1;
+}
+
+.control-panel h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.control-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.control-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #60a5fa;
+  cursor: pointer;
+}
+
+/* Dark Mode Styles */
+.app.dark-mode {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  color: #f9fafb;
+}
+
+.app.dark-mode .audio-controls,
+.app.dark-mode .speed-control,
+.app.dark-mode .figure-control,
+.app.dark-mode .sync-control,
+.app.dark-mode .control-panel,
+.app.dark-mode .personality-control {
+  background: rgba(31, 41, 55, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.app.dark-mode .file-input-wrapper label {
+  background: rgba(75, 85, 99, 0.4);
+  border: 2px solid #9ca3af;
+  color: #f9fafb;
+}
+
+.app.dark-mode .file-input-wrapper label:hover {
+  background: rgba(75, 85, 99, 0.6);
+}
+
+.app.dark-mode .stick-figure-canvas {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.app.dark-mode .audio-visualizer {
+  background: #0f172a;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.app.dark-mode .volume-control input[type="range"],
+.app.dark-mode .speed-slider,
+.app.dark-mode .figure-slider,
+.app.dark-mode .personality-slider {
+  background: rgba(75, 85, 99, 0.5);
+}
+
+.app.dark-mode .volume-control input[type="range"]::-webkit-slider-thumb,
+.app.dark-mode .speed-slider::-webkit-slider-thumb,
+.app.dark-mode .figure-slider::-webkit-slider-thumb,
+.app.dark-mode .personality-slider::-webkit-slider-thumb {
+  background: #60a5fa;
+}
+
+.app.dark-mode .sync-slider {
+  background: rgba(75, 85, 99, 0.5);
+}
+
+.app.dark-mode .sync-slider::before {
+  background: #f9fafb;
+}
+
+.app.dark-mode .reset-btn {
+  background: rgba(75, 85, 99, 0.4);
+  border: 1px solid rgba(156, 163, 175, 0.3);
+  color: #f9fafb;
+}
+
+.app.dark-mode .reset-btn:hover {
+  background: rgba(75, 85, 99, 0.6);
+}
+
+.app.dark-mode .personality-total {
+  background: rgba(75, 85, 99, 0.3);
+}
