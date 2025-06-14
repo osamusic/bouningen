@@ -21,13 +21,13 @@ function SyncControl({ onSyncChange, initialSync = false }) {
         />
         <span className="sync-slider"></span>
         <span className="sync-text">
-          {isSync ? 'シンクロモード' : '個性モード'}
+          {isSync ? 'Manual Sync' : 'Auto Sync'}
         </span>
       </label>
       <div className="sync-description">
         {isSync 
-          ? '全員が同じ動きで踊ります' 
-          : '各自が個性的に踊ります'
+          ? 'Always synchronized dancing' 
+          : 'Auto-sync on beat drops & high energy'
         }
       </div>
     </div>

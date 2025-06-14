@@ -13,7 +13,7 @@ function App() {
   const [analyser, setAnalyser] = useState(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [audioData, setAudioData] = useState(new Uint8Array(128))
-  const [animationSpeed, setAnimationSpeed] = useState(0.1)
+  const [animationSpeed, setAnimationSpeed] = useState(1.0)
   const [figureCount, setFigureCount] = useState(1)
   const [isSync, setIsSync] = useState(false)
   const [personalityBalance, setPersonalityBalance] = useState({
@@ -24,6 +24,7 @@ function App() {
     groover: 20
   })
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const [backgroundPattern, setBackgroundPattern] = useState('default')
   const animationRef = useRef()
 
   useEffect(() => {
@@ -76,7 +77,7 @@ function App() {
             initialSync={isSync}
           />
           
-          {/* Dark Mode Toggle */}
+          {/* Display Controls */}
           <div className="control-panel">
             <h3>🌙 Display</h3>
             <label className="control-item">
@@ -87,6 +88,21 @@ function App() {
               />
               Dark Mode
             </label>
+            
+            <div className="background-selector">
+              <label htmlFor="background-pattern">Background:</label>
+              <select
+                id="background-pattern"
+                value={backgroundPattern}
+                onChange={(e) => setBackgroundPattern(e.target.value)}
+              >
+                <option value="default">Default</option>
+                <option value="cosmic">🌌 Cosmic</option>
+                <option value="dreamlike">💫 Dreamlike</option>
+                <option value="geometric">🔷 Geometric</option>
+                <option value="waves">🌊 Waves</option>
+              </select>
+            </div>
           </div>
         </div>
         
@@ -103,6 +119,7 @@ function App() {
             isSync={isSync}
             personalityBalance={personalityBalance}
             isDarkMode={isDarkMode}
+            backgroundPattern={backgroundPattern}
           />
           <AudioVisualizer audioData={audioData} />
         </div>

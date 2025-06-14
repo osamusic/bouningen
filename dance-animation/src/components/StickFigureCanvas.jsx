@@ -62,7 +62,7 @@ class StickFigure {
     this.stepPhase = 0
   }
 
-  update(audioData, speedMultiplier = 0.1, isSync = false, syncPhase = 0, syncMove = 'idle') {
+  update(audioData, speedMultiplier = 1.0, isSync = false, syncPhase = 0, syncMove = 'idle') {
     const bassFreq = audioData.slice(0, 10).reduce((a, b) => a + b) / 10 / 255
     const midFreq = audioData.slice(10, 50).reduce((a, b) => a + b) / 40 / 255
     const highFreq = audioData.slice(50, 100).reduce((a, b) => a + b) / 50 / 255
@@ -105,7 +105,7 @@ class StickFigure {
     
     this.bounce = bassFreq * 45 * (1 + Math.sin(adjustedPhase * 0.2) * 0.3) * sizeVar
     this.armAngle = Math.sin(adjustedPhase * 0.8 * speedMultiplier * speedVar) * midFreq * Math.PI / 1.2
-    this.legAngle = Math.sin(adjustedPhase * 1.2 * speedMultiplier * speedVar) * bassFreq * Math.PI / 4
+    this.legAngle = Math.sin(adjustedPhase * 1.2 * speedMultiplier * speedVar) * bassFreq * Math.PI / 2.5
     this.headBob = Math.sin(adjustedPhase * 2 * speedMultiplier * speedVar) * highFreq * 6
     this.hipSwing = Math.sin(adjustedPhase * 0.5 * speedMultiplier * speedVar) * midFreq * 12
     
@@ -268,7 +268,7 @@ class StickFigure {
     if (this.freezeTime < 2) {
       this.bodyTilt = Math.sin(this.freezeTime * 10) * intensity * Math.PI / 3
       this.armAngle = Math.cos(this.freezeTime * 8) * Math.PI / 1.5
-      this.legAngle = Math.sin(this.freezeTime * 6) * Math.PI / 4
+      this.legAngle = Math.sin(this.freezeTime * 6) * Math.PI / 3
     } else {
       this.isBreaking = false
       this.currentMove = 'idle'
@@ -285,7 +285,7 @@ class StickFigure {
   executeJump(intensity) {
     this.jumpPhase += 0.5 * intensity
     this.bounce += Math.sin(this.jumpPhase) * intensity * 80
-    this.legAngle = Math.cos(this.jumpPhase) * intensity * Math.PI / 2
+    this.legAngle = Math.cos(this.jumpPhase) * intensity * Math.PI / 1.8
   }
 
   executeSpin(intensity) {
@@ -303,7 +303,7 @@ class StickFigure {
   executeMoonwalk(intensity) {
     this.moonwalkPhase += 0.2 * intensity
     this.x += Math.sin(this.moonwalkPhase) * intensity * 2
-    this.legAngle = Math.cos(this.moonwalkPhase) * intensity * Math.PI / 6
+    this.legAngle = Math.cos(this.moonwalkPhase) * intensity * Math.PI / 4
     this.bodyTilt = -intensity * 0.1
   }
 
@@ -317,7 +317,7 @@ class StickFigure {
   executeWindmill(intensity) {
     this.spinPhase += intensity * 1.2
     this.armAngle = this.spinPhase
-    this.legAngle = Math.sin(this.spinPhase) * Math.PI / 3
+    this.legAngle = Math.sin(this.spinPhase) * Math.PI / 2.2
     this.bodyTilt = Math.cos(this.spinPhase) * intensity * 0.3
   }
 
@@ -345,7 +345,7 @@ class StickFigure {
     this.armAngle = Math.sin(this.walkPhase) * intensity * Math.PI / 4
     
     // Walking leg movement
-    this.legAngle = Math.sin(this.walkPhase + Math.PI) * intensity * Math.PI / 6
+    this.legAngle = Math.sin(this.walkPhase + Math.PI) * intensity * Math.PI / 4
     
     // Step height for walking animation
     this.stepHeight = Math.abs(Math.sin(this.stepPhase)) * intensity * 10
@@ -746,7 +746,7 @@ class StickFigure {
     this.drawHandGesture(ctx, rightHandX, rightHandY, this.rightHandGesture)
     
     // Enhanced legs with knee bending
-    const kneeFlexion = Math.sin(this.dancePhase * 1.8) * 0.3
+    const kneeFlexion = Math.sin(this.dancePhase * 1.8) * 0.5
     
     // Left leg with walking step height
     ctx.beginPath()
@@ -897,13 +897,16 @@ class StickFigure {
   }
 }
 
-function StickFigureCanvas({ audioData, animationSpeed = 0.1, figureCount = 1, isSync = false, personalityBalance, isDarkMode = false }) {
+function StickFigureCanvas({ audioData, animationSpeed = 1.0, figureCount = 1, isSync = false, personalityBalance, isDarkMode = false, backgroundPattern = 'default' }) {
   const canvasRef = useRef(null)
   const stickFiguresRef = useRef([])
   const p5InstanceRef = useRef(null)
   const syncPhaseRef = useRef(0)
   const syncMoveRef = useRef('idle')
   const syncMoveTimerRef = useRef(0)
+  const autoSyncTimerRef = useRef(0)
+  const autoSyncStateRef = useRef(false)
+  const autoSyncDurationRef = useRef(0)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -968,7 +971,7 @@ function StickFigureCanvas({ audioData, animationSpeed = 0.1, figureCount = 1, i
           // Single row for small groups
           const spacing = canvas.width / (figureCount + 1)
           x = spacing * (i + 1)
-          y = canvas.height * 0.75
+          y = canvas.height * 0.55 // Moved down slightly from 0.45
         } else {
           // Multiple rows for larger groups
           const cols = Math.ceil(Math.sqrt(figureCount * (canvas.width / canvas.height)))
@@ -981,7 +984,7 @@ function StickFigureCanvas({ audioData, animationSpeed = 0.1, figureCount = 1, i
           const spacingY = canvas.height / (rows + 1)
           
           x = spacingX * (col + 1)
-          y = spacingY * (row + 1) + canvas.height * 0.2 // Start lower to leave space at top
+          y = spacingY * (row + 1) + canvas.height * 0.08 // Moved down slightly from 0.05
         }
         
         // Select personality based on distribution
@@ -1007,62 +1010,357 @@ function StickFigureCanvas({ audioData, animationSpeed = 0.1, figureCount = 1, i
       }
     }
     
-    // Dynamic background based on audio energy and mode
-    let bgColor = isDarkMode ? '#1a1a1a' : '#f0f0f0'
-    if (audioData && audioData.length > 0) {
-      const bassFreq = audioData.slice(0, 10).reduce((a, b) => a + b) / 10 / 255
-      const midFreq = audioData.slice(10, 50).reduce((a, b) => a + b) / 40 / 255
-      const highFreq = audioData.slice(50, 100).reduce((a, b) => a + b) / 50 / 255
+    // Dynamic background based on audio energy, mode, and pattern
+    const renderBackground = () => {
+      const bassFreq = audioData && audioData.length > 0 ? audioData.slice(0, 10).reduce((a, b) => a + b) / 10 / 255 : 0
+      const midFreq = audioData && audioData.length > 0 ? audioData.slice(10, 50).reduce((a, b) => a + b) / 40 / 255 : 0
+      const highFreq = audioData && audioData.length > 0 ? audioData.slice(50, 100).reduce((a, b) => a + b) / 50 / 255 : 0
       const totalEnergy = (bassFreq + midFreq + highFreq) / 3
       
-      // Color changes based on frequency bands
-      let hue = 200 // Default blue
-      let saturation = isDarkMode ? 40 : 20
-      let lightness = isDarkMode ? 15 : 95
+      const time = Date.now() * 0.001
       
-      if (bassFreq > 0.5) {
-        hue = (bassFreq * 60) % 360 // Red to yellow range for bass
-        saturation = Math.min(isDarkMode ? 80 : 60, bassFreq * 100)
-        if (isDarkMode) {
-          lightness = Math.min(35, 15 + bassFreq * 25)
-        } else {
-          lightness = Math.max(85, 95 - bassFreq * 20)
-        }
-      } else if (midFreq > 0.4) {
-        hue = (120 + midFreq * 120) % 360 // Green to blue range for mids
-        saturation = Math.min(isDarkMode ? 70 : 50, midFreq * 80)
-        if (isDarkMode) {
-          lightness = Math.min(30, 15 + midFreq * 20)
-        } else {
-          lightness = Math.max(88, 95 - midFreq * 15)
-        }
-      } else if (highFreq > 0.3) {
-        hue = (240 + highFreq * 120) % 360 // Blue to purple range for highs
-        saturation = Math.min(isDarkMode ? 60 : 40, highFreq * 60)
-        if (isDarkMode) {
-          lightness = Math.min(25, 15 + highFreq * 15)
-        } else {
-          lightness = Math.max(90, 95 - highFreq * 10)
-        }
+      switch (backgroundPattern) {
+        case 'cosmic':
+          renderCosmicBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
+          break
+        case 'dreamlike':
+          renderDreamlikeBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
+          break
+        case 'geometric':
+          renderGeometricBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
+          break
+        case 'waves':
+          renderWavesBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
+          break
+        default:
+          renderDefaultBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
       }
-      
-      // Pulse effect for high energy
-      if (totalEnergy > 0.6) {
-        const pulse = Math.sin(Date.now() * 0.01) * 0.1
-        if (isDarkMode) {
-          lightness += pulse * 15
-          saturation += pulse * 30
-        } else {
-          lightness += pulse * 10
-          saturation += pulse * 20
-        }
-      }
-      
-      bgColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`
     }
     
-    // Create gradient background for more dynamic effect
-    if (audioData && audioData.length > 0) {
+    const renderDefaultBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode) => {
+      let bgColor = isDarkMode ? '#1a1a1a' : '#f0f0f0'
+      
+      if (audioData && audioData.length > 0) {
+        // Color changes based on frequency bands
+        let hue = 200 // Default blue
+        let saturation = isDarkMode ? 40 : 20
+        let lightness = isDarkMode ? 15 : 95
+        
+        if (bassFreq > 0.5) {
+          hue = (bassFreq * 60) % 360 // Red to yellow range for bass
+          saturation = Math.min(isDarkMode ? 80 : 60, bassFreq * 100)
+          if (isDarkMode) {
+            lightness = Math.min(35, 15 + bassFreq * 25)
+          } else {
+            lightness = Math.max(85, 95 - bassFreq * 20)
+          }
+        } else if (midFreq > 0.4) {
+          hue = (120 + midFreq * 120) % 360 // Green to blue range for mids
+          saturation = Math.min(isDarkMode ? 70 : 50, midFreq * 80)
+          if (isDarkMode) {
+            lightness = Math.min(30, 15 + midFreq * 20)
+          } else {
+            lightness = Math.max(88, 95 - midFreq * 15)
+          }
+        } else if (highFreq > 0.3) {
+          hue = (240 + highFreq * 120) % 360 // Blue to purple range for highs
+          saturation = Math.min(isDarkMode ? 60 : 40, highFreq * 60)
+          if (isDarkMode) {
+            lightness = Math.min(25, 15 + highFreq * 15)
+          } else {
+            lightness = Math.max(90, 95 - highFreq * 10)
+          }
+        }
+        
+        // Pulse effect for high energy
+        if (totalEnergy > 0.6) {
+          const pulse = Math.sin(time * 10) * 0.1
+          if (isDarkMode) {
+            lightness += pulse * 15
+            saturation += pulse * 30
+          } else {
+            lightness += pulse * 10
+            saturation += pulse * 20
+          }
+        }
+        
+        bgColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`
+      }
+      
+      ctx.fillStyle = bgColor
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }
+    
+    const renderCosmicBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode) => {
+      // Deep space base
+      const baseHue = 240 + time * 5
+      const baseBg = isDarkMode ? '#0a0a1a' : '#1a1a2e'
+      ctx.fillStyle = baseBg
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Nebula clouds
+      if (totalEnergy > 0.2) {
+        const nebulaeCount = Math.floor(totalEnergy * 5) + 3
+        for (let i = 0; i < nebulaeCount; i++) {
+          const x = (time * 10 + i * 100) % (canvas.width + 200) - 100
+          const y = (Math.sin(time * 0.5 + i) * 50 + canvas.height / 2)
+          const size = 80 + totalEnergy * 120
+          
+          const gradient = ctx.createRadialGradient(x, y, 0, x, y, size)
+          gradient.addColorStop(0, `hsla(${baseHue + i * 30}, 80%, 60%, ${totalEnergy * 0.4})`)
+          gradient.addColorStop(0.7, `hsla(${baseHue + i * 60}, 60%, 40%, ${totalEnergy * 0.2})`)
+          gradient.addColorStop(1, 'transparent')
+          
+          ctx.fillStyle = gradient
+          ctx.beginPath()
+          ctx.arc(x, y, size, 0, Math.PI * 2)
+          ctx.fill()
+        }
+      }
+      
+      // Stars
+      const starCount = 50 + Math.floor(highFreq * 30)
+      for (let i = 0; i < starCount; i++) {
+        const x = (time * 2 + i * 23.7) % canvas.width
+        const y = (time * 1.5 + i * 17.3) % canvas.height
+        const brightness = 0.3 + Math.sin(time * 3 + i) * 0.7
+        const size = 1 + highFreq * 3
+        
+        ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`
+        ctx.beginPath()
+        ctx.arc(x, y, size, 0, Math.PI * 2)
+        ctx.fill()
+      }
+      
+      // Galaxy spiral
+      if (bassFreq > 0.4) {
+        ctx.save()
+        ctx.translate(canvas.width / 2, canvas.height / 2)
+        ctx.rotate(time * 0.1)
+        
+        for (let i = 0; i < 100; i++) {
+          const angle = (i / 100) * Math.PI * 4 + time
+          const radius = i * 2 + bassFreq * 50
+          const x = Math.cos(angle) * radius
+          const y = Math.sin(angle) * radius * 0.3
+          
+          ctx.fillStyle = `hsla(${240 + i * 2}, 70%, 60%, ${0.1 + bassFreq * 0.3})`
+          ctx.beginPath()
+          ctx.arc(x, y, 2 + bassFreq * 3, 0, Math.PI * 2)
+          ctx.fill()
+        }
+        ctx.restore()
+      }
+    }
+    
+    const renderDreamlikeBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode) => {
+      // Soft gradient base
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
+      const baseHue = 300 + Math.sin(time * 0.5) * 60
+      
+      if (isDarkMode) {
+        gradient.addColorStop(0, `hsl(${baseHue}, 40%, 15%)`)
+        gradient.addColorStop(0.5, `hsl(${baseHue + 60}, 30%, 10%)`)
+        gradient.addColorStop(1, `hsl(${baseHue + 120}, 35%, 12%)`)
+      } else {
+        gradient.addColorStop(0, `hsl(${baseHue}, 30%, 95%)`)
+        gradient.addColorStop(0.5, `hsl(${baseHue + 60}, 25%, 92%)`)
+        gradient.addColorStop(1, `hsl(${baseHue + 120}, 28%, 90%)`)
+      }
+      
+      ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Floating dream bubbles
+      const bubbleCount = 8 + Math.floor(midFreq * 12)
+      for (let i = 0; i < bubbleCount; i++) {
+        const x = (time * 15 + i * 77) % (canvas.width + 100) - 50
+        const y = Math.sin(time * 0.7 + i * 0.5) * (canvas.height * 0.3) + canvas.height / 2
+        const size = 20 + Math.sin(time * 2 + i) * 15 + midFreq * 30
+        
+        const bubbleGradient = ctx.createRadialGradient(x, y, 0, x, y, size)
+        bubbleGradient.addColorStop(0, `hsla(${baseHue + i * 40}, 60%, 80%, 0.3)`)
+        bubbleGradient.addColorStop(0.8, `hsla(${baseHue + i * 40}, 40%, 70%, 0.1)`)
+        bubbleGradient.addColorStop(1, 'transparent')
+        
+        ctx.fillStyle = bubbleGradient
+        ctx.beginPath()
+        ctx.arc(x, y, size, 0, Math.PI * 2)
+        ctx.fill()
+      }
+      
+      // Dreamy particles
+      if (highFreq > 0.3) {
+        const particleCount = Math.floor(highFreq * 20)
+        for (let i = 0; i < particleCount; i++) {
+          const x = Math.sin(time * 2 + i * 0.1) * (canvas.width * 0.4) + canvas.width / 2
+          const y = (time * 25 + i * 50) % (canvas.height + 50) - 25
+          const size = 1 + Math.sin(time * 4 + i) * 2
+          
+          ctx.fillStyle = `hsla(${baseHue + i * 20}, 70%, 85%, ${highFreq * 0.8})`
+          ctx.beginPath()
+          ctx.arc(x, y, size, 0, Math.PI * 2)
+          ctx.fill()
+        }
+      }
+      
+      // Soft aurora waves
+      if (bassFreq > 0.3) {
+        ctx.save()
+        ctx.globalCompositeOperation = 'overlay'
+        
+        for (let wave = 0; wave < 3; wave++) {
+          ctx.beginPath()
+          ctx.moveTo(0, canvas.height / 2)
+          
+          for (let x = 0; x <= canvas.width; x += 10) {
+            const y = canvas.height / 2 + 
+              Math.sin((x + time * 100 + wave * 100) * 0.01) * bassFreq * 50 +
+              Math.sin((x + time * 150 + wave * 150) * 0.005) * bassFreq * 30
+            ctx.lineTo(x, y)
+          }
+          
+          ctx.strokeStyle = `hsla(${baseHue + wave * 120}, 60%, 70%, ${bassFreq * 0.3})`
+          ctx.lineWidth = 3 + bassFreq * 5
+          ctx.stroke()
+        }
+        ctx.restore()
+      }
+    }
+    
+    const renderGeometricBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode) => {
+      // Base color
+      const baseColor = isDarkMode ? '#0f0f23' : '#f5f5f5'
+      ctx.fillStyle = baseColor
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Rotating geometric shapes
+      const shapeCount = 6 + Math.floor(totalEnergy * 8)
+      for (let i = 0; i < shapeCount; i++) {
+        ctx.save()
+        
+        const x = (canvas.width / (shapeCount + 1)) * (i + 1)
+        const y = canvas.height / 2 + Math.sin(time * 2 + i) * 100
+        const rotation = time * (0.5 + i * 0.1) + bassFreq * 2
+        const scale = 0.5 + totalEnergy + Math.sin(time * 3 + i) * 0.3
+        
+        ctx.translate(x, y)
+        ctx.rotate(rotation)
+        ctx.scale(scale, scale)
+        
+        const sides = 3 + i % 5
+        const radius = 30 + midFreq * 40
+        const hue = (time * 30 + i * 60) % 360
+        
+        ctx.beginPath()
+        for (let s = 0; s < sides; s++) {
+          const angle = (s / sides) * Math.PI * 2
+          const px = Math.cos(angle) * radius
+          const py = Math.sin(angle) * radius
+          if (s === 0) ctx.moveTo(px, py)
+          else ctx.lineTo(px, py)
+        }
+        ctx.closePath()
+        
+        ctx.fillStyle = `hsla(${hue}, 70%, ${isDarkMode ? 60 : 40}%, ${0.3 + totalEnergy * 0.4})`
+        ctx.fill()
+        
+        ctx.strokeStyle = `hsla(${hue}, 80%, ${isDarkMode ? 80 : 20}%, ${0.6 + totalEnergy * 0.4})`
+        ctx.lineWidth = 2
+        ctx.stroke()
+        
+        ctx.restore()
+      }
+      
+      // Grid pattern
+      if (highFreq > 0.4) {
+        const gridSize = 50 - highFreq * 20
+        ctx.strokeStyle = `hsla(0, 0%, ${isDarkMode ? 100 : 0}%, ${highFreq * 0.2})`
+        ctx.lineWidth = 1
+        
+        for (let x = 0; x < canvas.width; x += gridSize) {
+          ctx.beginPath()
+          ctx.moveTo(x, 0)
+          ctx.lineTo(x, canvas.height)
+          ctx.stroke()
+        }
+        
+        for (let y = 0; y < canvas.height; y += gridSize) {
+          ctx.beginPath()
+          ctx.moveTo(0, y)
+          ctx.lineTo(canvas.width, y)
+          ctx.stroke()
+        }
+      }
+    }
+    
+    const renderWavesBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode) => {
+      // Ocean gradient
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+      const baseHue = 200 + Math.sin(time * 0.3) * 40
+      
+      if (isDarkMode) {
+        gradient.addColorStop(0, `hsl(${baseHue}, 50%, 10%)`)
+        gradient.addColorStop(0.7, `hsl(${baseHue + 20}, 60%, 15%)`)
+        gradient.addColorStop(1, `hsl(${baseHue + 40}, 70%, 8%)`)
+      } else {
+        gradient.addColorStop(0, `hsl(${baseHue}, 40%, 90%)`)
+        gradient.addColorStop(0.7, `hsl(${baseHue + 20}, 50%, 85%)`)
+        gradient.addColorStop(1, `hsl(${baseHue + 40}, 60%, 80%)`)
+      }
+      
+      ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Multiple wave layers
+      const waveCount = 5
+      for (let layer = 0; layer < waveCount; layer++) {
+        ctx.beginPath()
+        
+        const amplitude = 20 + (bassFreq + midFreq) * 40 * (1 - layer * 0.1)
+        const frequency = 0.01 + layer * 0.002
+        const speed = 50 + layer * 20
+        const yOffset = canvas.height * 0.6 + layer * 15
+        
+        ctx.moveTo(0, yOffset)
+        
+        for (let x = 0; x <= canvas.width; x += 5) {
+          const y = yOffset + 
+            Math.sin((x + time * speed) * frequency) * amplitude +
+            Math.sin((x + time * speed * 1.5) * frequency * 2) * amplitude * 0.5
+          ctx.lineTo(x, y)
+        }
+        
+        ctx.lineTo(canvas.width, canvas.height)
+        ctx.lineTo(0, canvas.height)
+        ctx.closePath()
+        
+        const alpha = 0.1 + totalEnergy * 0.3
+        const layerHue = baseHue + layer * 15
+        ctx.fillStyle = `hsla(${layerHue}, 60%, ${isDarkMode ? 40 : 60}%, ${alpha})`
+        ctx.fill()
+      }
+      
+      // Foam particles
+      if (highFreq > 0.3) {
+        const foamCount = Math.floor(highFreq * 30)
+        for (let i = 0; i < foamCount; i++) {
+          const x = (time * 80 + i * 25) % (canvas.width + 20) - 10
+          const y = canvas.height * 0.6 + Math.sin(time * 3 + i) * 20 + Math.random() * 30
+          const size = 2 + Math.random() * 4
+          
+          ctx.fillStyle = `rgba(255, 255, 255, ${highFreq * 0.8})`
+          ctx.beginPath()
+          ctx.arc(x, y, size, 0, Math.PI * 2)
+          ctx.fill()
+        }
+      }
+    }
+    
+    renderBackground()
+    
+    // Default pattern includes gradient overlay for non-default patterns
+    if (backgroundPattern === 'default' && audioData && audioData.length > 0) {
       const bassFreq = audioData.slice(0, 10).reduce((a, b) => a + b) / 10 / 255
       const midFreq = audioData.slice(10, 50).reduce((a, b) => a + b) / 40 / 255
       const highFreq = audioData.slice(50, 100).reduce((a, b) => a + b) / 50 / 255
@@ -1080,22 +1378,16 @@ function StickFigureCanvas({ audioData, animationSpeed = 0.1, figureCount = 1, i
         if (isDarkMode) {
           gradient.addColorStop(0, `hsla(${centerHue}, 80%, 40%, 0.4)`)
           gradient.addColorStop(0.7, `hsla(${edgeHue}, 60%, 20%, 0.2)`)
-          gradient.addColorStop(1, bgColor)
+          gradient.addColorStop(1, 'transparent')
         } else {
           gradient.addColorStop(0, `hsla(${centerHue}, 60%, 90%, 0.3)`)
           gradient.addColorStop(0.7, `hsla(${edgeHue}, 40%, 95%, 0.1)`)
-          gradient.addColorStop(1, bgColor)
+          gradient.addColorStop(1, 'transparent')
         }
         
         ctx.fillStyle = gradient
         ctx.fillRect(0, 0, canvas.width, canvas.height)
-      } else {
-        ctx.fillStyle = bgColor
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
       }
-    } else {
-      ctx.fillStyle = bgColor
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
     }
     
     // Add dynamic visual effects for high energy
@@ -1167,7 +1459,34 @@ function StickFigureCanvas({ audioData, animationSpeed = 0.1, figureCount = 1, i
     }
     
     if (audioData && audioData.length > 0) {
-      if (isSync) {
+      // Auto sync/unsync logic (only when not manually controlled)
+      if (!isSync) {
+        autoSyncTimerRef.current += animationSpeed
+        
+        // Check for high energy moments or beat drops
+        const bassFreq = audioData.slice(0, 10).reduce((a, b) => a + b) / 10 / 255
+        const midFreq = audioData.slice(10, 50).reduce((a, b) => a + b) / 40 / 255
+        const highFreq = audioData.slice(50, 100).reduce((a, b) => a + b) / 50 / 255
+        const ultraHighFreq = audioData.slice(100, 150).reduce((a, b) => a + b) / 50 / 255
+        const totalEnergy = bassFreq + midFreq + highFreq + ultraHighFreq
+        
+        // Trigger auto-sync on high energy moments
+        if (!autoSyncStateRef.current && (totalEnergy > 1.8 || bassFreq > 0.8) && autoSyncTimerRef.current > 5) {
+          autoSyncStateRef.current = true
+          autoSyncDurationRef.current = 3 + Math.random() * 4 // Sync for 3-7 seconds
+          autoSyncTimerRef.current = 0
+        }
+        
+        // End auto-sync after duration or when energy drops
+        if (autoSyncStateRef.current && (autoSyncTimerRef.current > autoSyncDurationRef.current || totalEnergy < 0.5)) {
+          autoSyncStateRef.current = false
+          autoSyncTimerRef.current = 0
+        }
+      }
+      
+      const currentSyncState = isSync || autoSyncStateRef.current
+      
+      if (currentSyncState) {
         // Update synchronized phase and move selection
         const bassFreq = audioData.slice(0, 10).reduce((a, b) => a + b) / 10 / 255
         const midFreq = audioData.slice(10, 50).reduce((a, b) => a + b) / 40 / 255
@@ -1195,7 +1514,7 @@ function StickFigureCanvas({ audioData, animationSpeed = 0.1, figureCount = 1, i
       }
       
       stickFiguresRef.current.forEach(figure => {
-        figure.update(audioData, animationSpeed, isSync, syncPhaseRef.current, syncMoveRef.current)
+        figure.update(audioData, animationSpeed, currentSyncState, syncPhaseRef.current, syncMoveRef.current)
       })
     }
     
@@ -1203,7 +1522,7 @@ function StickFigureCanvas({ audioData, animationSpeed = 0.1, figureCount = 1, i
       figure.draw(ctx)
     })
     
-  }, [audioData, animationSpeed, figureCount, isSync, personalityBalance, isDarkMode])
+  }, [audioData, animationSpeed, figureCount, isSync, personalityBalance, isDarkMode, backgroundPattern])
 
   return (
     <canvas 
