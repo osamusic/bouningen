@@ -69,7 +69,6 @@ function App() {
     
     // Detect volume changes (more common than silence)
     const prevTotalEnergy = prevBassFreq + prevMidFreq + prevHighFreq
-    const energyChange = Math.abs(totalEnergy - prevTotalEnergy)
     
     // Detect significant volume drops and increases
     const isVolumeDropSignificant = totalEnergy < prevTotalEnergy * 0.6 && prevTotalEnergy > 0.3
@@ -86,12 +85,9 @@ function App() {
     }
 
     // Decide when to toggle sync
-    let shouldToggleSync = false
-    
     if (syncChangeCountdownRef.current === 0) {
       if (isBeatDrop || isBuildUp) {
         // High energy moments favor sync
-        shouldToggleSync = true
         const syncProbability = 0.8
         const newSyncState = Math.random() < syncProbability
         if (newSyncState !== currentSyncStateRef.current) {
@@ -101,7 +97,6 @@ function App() {
         }
       } else if (isBreakdown) {
         // Breakdowns favor individual movement
-        shouldToggleSync = true
         const syncProbability = 0.2
         const newSyncState = Math.random() < syncProbability
         if (newSyncState !== currentSyncStateRef.current) {
@@ -111,7 +106,6 @@ function App() {
         }
       } else if (isSongBreak) {
         // Volume changes are good moments to change sync
-        shouldToggleSync = true
         let syncProbability = 0.6
         
         // Volume drops favor individual movement (like quiet verses)
@@ -131,7 +125,6 @@ function App() {
         }
       } else if (isTempoChange) {
         // Tempo changes suggest new musical section
-        shouldToggleSync = true
         const syncProbability = 0.7 // Favor sync for tempo changes
         const newSyncState = Math.random() < syncProbability
         if (newSyncState !== currentSyncStateRef.current) {
@@ -141,7 +134,6 @@ function App() {
         }
       } else if (isMusicalChange) {
         // General musical changes have balanced probability
-        shouldToggleSync = true
         const syncProbability = 0.5
         const newSyncState = Math.random() < syncProbability
         if (newSyncState !== currentSyncStateRef.current) {
@@ -180,7 +172,7 @@ function App() {
         }
       }
     }
-  }, [analyser, isPlaying])
+  }, [analyser, isPlaying, autoSyncControl])
 
   return (
     <div className={`app ${isDarkMode ? 'dark-mode' : ''}`}>
