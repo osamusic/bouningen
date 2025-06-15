@@ -310,6 +310,52 @@ main {
 }
 
 /* ==================== */
+/* Two-Column Layout    */
+/* ==================== */
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+  min-height: 80vh;
+}
+
+.canvas-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.controls-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Scrollbar styling for controls section */
+.controls-section::-webkit-scrollbar {
+  width: 6px;
+}
+
+.controls-section::-webkit-scrollbar-track {
+  background: rgba(108, 92, 231, 0.1);
+  border-radius: 3px;
+}
+
+.controls-section::-webkit-scrollbar-thumb {
+  background: var(--primary-coral);
+  border-radius: 3px;
+}
+
+.controls-section::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-purple);
+}
+
+/* ==================== */
 /* Canvas Container     */
 /* ==================== */
 
@@ -609,9 +655,9 @@ button:active::before {
 
 .controls-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   animation: slideInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
 }
 
@@ -779,6 +825,9 @@ button:active::before {
   margin-top: 2rem;
   position: relative;
   overflow: hidden;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .video-recorder::before {
@@ -921,6 +970,20 @@ button:active::before {
   
   main {
     padding: 1rem;
+  }
+  
+  .main-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .controls-section {
+    max-height: none;
+    overflow-y: visible;
+  }
+  
+  .video-recorder {
+    margin-top: 1rem;
   }
   
   .controls-container {

@@ -998,7 +998,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
           
           if (aspectRatio === '9:16') {
             // For vertical format, account for drawing offsets (head drawn ~95px above baseY)
-            y = canvas.height * 0.85 // Much lower to account for upward drawing offset
+            y = canvas.height * 0.55 // Much higher to prevent cutting off with multiple figures
           } else {
             // For horizontal format
             y = canvas.height * 0.55 // Original for horizontal
@@ -1018,7 +1018,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
           
           if (aspectRatio === '9:16') {
             // For vertical format, account for drawing offsets
-            y = spacingY * (row + 1) + canvas.height * 0.5 // Start much lower for vertical format
+            y = spacingY * (row + 1) + canvas.height * 0.05 // Minimal 5% offset for optimal space usage
           } else {
             // For horizontal format
             y = spacingY * (row + 1) + canvas.height * 0.08 // Original for horizontal

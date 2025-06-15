@@ -90,92 +90,98 @@ function App() {
       </header>
       
       <main>
-        <div className="canvas-container">
-          <StickFigureCanvas 
-            ref={canvasRef}
-            audioData={audioData} 
-            animationSpeed={animationSpeed}
-            figureCount={figureCount}
-            isSync={isSync}
-            personalityBalance={personalityBalance}
-            isDarkMode={isDarkMode}
-            backgroundPattern={backgroundPattern}
-            aspectRatio={aspectRatio}
-            showParticles={showParticles}
-          />
-          <AudioVisualizer audioData={audioData} />
-        </div>
-
-        <AudioControls 
-          setAudioContext={setAudioContext}
-          setAnalyser={setAnalyser}
-          setIsPlaying={setIsPlaying}
-          isPlaying={isPlaying}
-        />
-        
-        <div className="controls-container">
-          <SpeedControl 
-            onSpeedChange={setAnimationSpeed}
-            initialSpeed={animationSpeed}
-          />
-          
-          <FigureControl 
-            onFigureCountChange={setFigureCount}
-            initialCount={figureCount}
-          />
-          
-          <SyncControl 
-            onSyncChange={setIsSync}
-            initialSync={isSync}
-          />
-          
-          {/* Display Controls */}
-          <div className="control-panel">
-            <h3>{t('display')}</h3>
-            <label className="control-item">
-              <input
-                type="checkbox"
-                checked={isDarkMode}
-                onChange={(e) => setIsDarkMode(e.target.checked)}
+        <div className="main-layout">
+          <div className="canvas-section">
+            <div className="canvas-container">
+              <StickFigureCanvas 
+                ref={canvasRef}
+                audioData={audioData} 
+                animationSpeed={animationSpeed}
+                figureCount={figureCount}
+                isSync={isSync}
+                personalityBalance={personalityBalance}
+                isDarkMode={isDarkMode}
+                backgroundPattern={backgroundPattern}
+                aspectRatio={aspectRatio}
+                showParticles={showParticles}
               />
-              {t('darkMode')}
-            </label>
-            
-            <label className="control-item">
-              <input
-                type="checkbox"
-                checked={showParticles}
-                onChange={(e) => setShowParticles(e.target.checked)}
-              />
-              {t('showParticles')}
-            </label>
-            
-            <div className="background-selector">
-              <label htmlFor="background-pattern">{t('background')}</label>
-              <select
-                id="background-pattern"
-                value={backgroundPattern}
-                onChange={(e) => setBackgroundPattern(e.target.value)}
-              >
-                <option value="default">{t('bgDefault')}</option>
-                <option value="cosmic">{t('bgCosmic')}</option>
-                <option value="dreamlike">{t('bgDreamlike')}</option>
-                <option value="geometric">{t('bgGeometric')}</option>
-                <option value="waves">{t('bgWaves')}</option>
-                <option value="clouds">{t('bgClouds')}</option>
-                <option value="neon">{t('bgNeon')}</option>
-                <option value="matrix">{t('bgMatrix')}</option>
-                <option value="rainbow">{t('bgRainbow')}</option>
-                <option value="fire">{t('bgFire')}</option>
-              </select>
+              <AudioVisualizer audioData={audioData} />
             </div>
           </div>
+
+          <div className="controls-section">
+            <AudioControls 
+              setAudioContext={setAudioContext}
+              setAnalyser={setAnalyser}
+              setIsPlaying={setIsPlaying}
+              isPlaying={isPlaying}
+            />
+            
+            <div className="controls-container">
+              <SpeedControl 
+                onSpeedChange={setAnimationSpeed}
+                initialSpeed={animationSpeed}
+              />
+              
+              <FigureControl 
+                onFigureCountChange={setFigureCount}
+                initialCount={figureCount}
+              />
+              
+              <SyncControl 
+                onSyncChange={setIsSync}
+                initialSync={isSync}
+              />
+              
+              {/* Display Controls */}
+              <div className="control-panel">
+                <h3>{t('display')}</h3>
+                <label className="control-item">
+                  <input
+                    type="checkbox"
+                    checked={isDarkMode}
+                    onChange={(e) => setIsDarkMode(e.target.checked)}
+                  />
+                  {t('darkMode')}
+                </label>
+                
+                <label className="control-item">
+                  <input
+                    type="checkbox"
+                    checked={showParticles}
+                    onChange={(e) => setShowParticles(e.target.checked)}
+                  />
+                  {t('showParticles')}
+                </label>
+                
+                <div className="background-selector">
+                  <label htmlFor="background-pattern">{t('background')}</label>
+                  <select
+                    id="background-pattern"
+                    value={backgroundPattern}
+                    onChange={(e) => setBackgroundPattern(e.target.value)}
+                  >
+                    <option value="default">{t('bgDefault')}</option>
+                    <option value="cosmic">{t('bgCosmic')}</option>
+                    <option value="dreamlike">{t('bgDreamlike')}</option>
+                    <option value="geometric">{t('bgGeometric')}</option>
+                    <option value="waves">{t('bgWaves')}</option>
+                    <option value="clouds">{t('bgClouds')}</option>
+                    <option value="neon">{t('bgNeon')}</option>
+                    <option value="matrix">{t('bgMatrix')}</option>
+                    <option value="rainbow">{t('bgRainbow')}</option>
+                    <option value="fire">{t('bgFire')}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <PersonalityControl 
+              onPersonalityBalanceChange={setPersonalityBalance}
+              initialBalance={personalityBalance}
+            />
+          </div>
         </div>
-        
-        <PersonalityControl 
-          onPersonalityBalanceChange={setPersonalityBalance}
-          initialBalance={personalityBalance}
-        />
         
         <VideoRecorder 
           canvasRef={canvasRef}
