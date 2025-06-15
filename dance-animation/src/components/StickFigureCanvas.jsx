@@ -1,5 +1,142 @@
 import { useRef, useEffect, forwardRef } from 'react'
 
+// Formation helper functions
+const getFormationType = (figureCount) => {
+  if (figureCount <= 3) return 'line'
+  if (figureCount <= 6) return 'triangle'
+  if (figureCount <= 10) return 'inverted-triangle'
+  if (figureCount <= 15) return 'diamond'
+  if (figureCount <= 25) return 'circle'
+  return 'grid'
+}
+
+const getFormationPosition = (index, total, formation, canvas, aspectRatio = '16:9') => {
+  const centerX = canvas.width / 2
+  const centerY = aspectRatio === '9:16' ? canvas.height * 0.55 : canvas.height * 0.7
+  
+  switch (formation) {
+    case 'line': {
+      const spacing = canvas.width / (total + 1)
+      return {
+        x: spacing * (index + 1),
+        y: centerY
+      }
+    }
+      
+    case 'triangle':
+      return getTrianglePosition(index, total, centerX, centerY, canvas)
+      
+    case 'inverted-triangle':
+      return getInvertedTrianglePosition(index, total, centerX, centerY, canvas)
+      
+    case 'diamond':
+      return getDiamondPosition(index, total, centerX, centerY, canvas)
+      
+    case 'circle':
+      return getCirclePosition(index, total, centerX, centerY, canvas)
+      
+    case 'grid':
+    default:
+      return getGridPosition(index, total, canvas, aspectRatio)
+  }
+}
+
+const getTrianglePosition = (index, total, centerX, centerY, canvas) => {
+  // Create triangle formation with more figures at the bottom
+  const rows = Math.ceil(Math.sqrt(total * 2))
+  let currentIndex = 0
+  
+  for (let row = 0; row < rows; row++) {
+    const figuresInRow = Math.min(row + 1, total - currentIndex)
+    if (index >= currentIndex && index < currentIndex + figuresInRow) {
+      const posInRow = index - currentIndex
+      const rowSpacing = (canvas.width * 0.6) / Math.max(1, figuresInRow - 1)
+      const startX = centerX - (rowSpacing * (figuresInRow - 1)) / 2
+      
+      return {
+        x: figuresInRow === 1 ? centerX : startX + posInRow * rowSpacing,
+        y: centerY - (rows - row - 1) * 80 + (canvas.height * 0.1)
+      }
+    }
+    currentIndex += figuresInRow
+    if (currentIndex >= total) break
+  }
+  
+  return { x: centerX, y: centerY }
+}
+
+const getInvertedTrianglePosition = (index, total, centerX, centerY, canvas) => {
+  // Create inverted triangle formation with more figures at the top
+  const rows = Math.ceil(Math.sqrt(total * 2))
+  let currentIndex = 0
+  
+  for (let row = 0; row < rows; row++) {
+    const figuresInRow = Math.max(1, Math.min(rows - row, total - currentIndex))
+    if (index >= currentIndex && index < currentIndex + figuresInRow) {
+      const posInRow = index - currentIndex
+      const rowSpacing = (canvas.width * 0.6) / Math.max(1, figuresInRow - 1)
+      const startX = centerX - (rowSpacing * (figuresInRow - 1)) / 2
+      
+      return {
+        x: figuresInRow === 1 ? centerX : startX + posInRow * rowSpacing,
+        y: centerY - (rows - row - 1) * 80 + (canvas.height * 0.1)
+      }
+    }
+    currentIndex += figuresInRow
+    if (currentIndex >= total) break
+  }
+  
+  return { x: centerX, y: centerY }
+}
+
+const getDiamondPosition = (index, total, centerX, centerY, canvas) => {
+  // Create diamond formation
+  const halfTotal = Math.ceil(total / 2)
+  
+  if (index < halfTotal) {
+    // Top half (triangle)
+    return getTrianglePosition(index, halfTotal, centerX, centerY - 60, canvas)
+  } else {
+    // Bottom half (inverted triangle)
+    return getInvertedTrianglePosition(index - halfTotal, total - halfTotal, centerX, centerY + 60, canvas)
+  }
+}
+
+const getCirclePosition = (index, total, centerX, centerY, canvas) => {
+  const angle = (index / total) * Math.PI * 2
+  const radius = Math.min(canvas.width, canvas.height) * 0.25
+  
+  return {
+    x: centerX + Math.cos(angle) * radius,
+    y: centerY + Math.sin(angle) * radius * 0.6 // Flatten the circle a bit
+  }
+}
+
+const getGridPosition = (index, total, canvas, aspectRatio) => {
+  // Multiple rows for larger groups
+  const cols = Math.ceil(Math.sqrt(total * (canvas.width / canvas.height)))
+  const rows = Math.ceil(total / cols)
+  
+  const row = Math.floor(index / cols)
+  const col = index % cols
+  
+  const spacingX = canvas.width / (cols + 1)
+  const spacingY = canvas.height / (rows + 1)
+  
+  const x = spacingX * (col + 1)
+  
+  let y
+  if (aspectRatio === '9:16') {
+    // For vertical format, account for drawing offsets
+    y = spacingY * (row + 1) + canvas.height * 0.05 // Minimal 5% offset for optimal space usage
+  } else {
+    // For horizontal format
+    y = spacingY * (row + 1) + canvas.height * 0.08 // Original for horizontal
+  }
+  
+  return { x, y }
+}
+
 class StickFigure {
   constructor(x, y, p, id = 0) {
     this.x = x
@@ -991,39 +1128,12 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
       for (let i = 0; i < figureCount; i++) {
         let x, y
         
-        if (figureCount <= 8) {
-          // Single row for small groups
-          const spacing = canvas.width / (figureCount + 1)
-          x = spacing * (i + 1)
-          
-          if (aspectRatio === '9:16') {
-            // For vertical format, account for drawing offsets (head drawn ~95px above baseY)
-            y = canvas.height * 0.55 // Much higher to prevent cutting off with multiple figures
-          } else {
-            // For horizontal format
-            y = canvas.height * 0.55 // Original for horizontal
-          }
-        } else {
-          // Multiple rows for larger groups
-          const cols = Math.ceil(Math.sqrt(figureCount * (canvas.width / canvas.height)))
-          const rows = Math.ceil(figureCount / cols)
-          
-          const row = Math.floor(i / cols)
-          const col = i % cols
-          
-          const spacingX = canvas.width / (cols + 1)
-          const spacingY = canvas.height / (rows + 1)
-          
-          x = spacingX * (col + 1)
-          
-          if (aspectRatio === '9:16') {
-            // For vertical format, account for drawing offsets
-            y = spacingY * (row + 1) + canvas.height * 0.05 // Minimal 5% offset for optimal space usage
-          } else {
-            // For horizontal format
-            y = spacingY * (row + 1) + canvas.height * 0.08 // Original for horizontal
-          }
-        }
+        // Determine formation type based on figure count
+        const formation = getFormationType(figureCount)
+        const position = getFormationPosition(i, figureCount, formation, canvas, aspectRatio)
+        
+        x = position.x
+        y = position.y
         
         // Select personality based on distribution
         const personalityIndex = Math.floor(Math.random() * distribution.length)

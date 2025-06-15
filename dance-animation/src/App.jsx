@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import './App.css'
 import StickFigureCanvas from './components/StickFigureCanvas'
 import AudioControls from './components/AudioControls'
@@ -20,6 +20,7 @@ function App() {
   const [figureCount, setFigureCount] = useState(1)
   const [isSync, setIsSync] = useState(false)
   const [autoSyncControl, setAutoSyncControl] = useState(true)
+  const [autoFigureMode, setAutoFigureMode] = useState(false)
   const [personalityBalance, setPersonalityBalance] = useState({
     breakdancer: 20,
     waver: 20,
@@ -37,6 +38,42 @@ function App() {
   const lastAudioDataRef = useRef([])
   const syncChangeCountdownRef = useRef(0)
   const currentSyncStateRef = useRef(false)
+
+  const autoFigureBasedOnMusic = useCallback((newAudioData) => {
+    if (lastAudioDataRef.current.length === 0) {
+      lastAudioDataRef.current = newAudioData
+      return
+    }
+
+    // Calculate current audio characteristics
+    const bassFreq = newAudioData.slice(0, 10).reduce((a, b) => a + b) / 10 / 255
+    const midFreq = newAudioData.slice(10, 50).reduce((a, b) => a + b) / 40 / 255
+    const highFreq = newAudioData.slice(50, 100).reduce((a, b) => a + b) / 50 / 255
+    const totalEnergy = bassFreq + midFreq + highFreq
+
+    // Determine target figure count based on music intensity
+    let targetFigureCount = 1
+    if (totalEnergy > 0.8) {
+      targetFigureCount = Math.min(20, Math.floor(totalEnergy * 25)) // High energy: up to 20 figures
+    } else if (totalEnergy > 0.6) {
+      targetFigureCount = Math.min(12, Math.floor(totalEnergy * 20)) // Medium-high energy: up to 12 figures
+    } else if (totalEnergy > 0.4) {
+      targetFigureCount = Math.min(8, Math.floor(totalEnergy * 15)) // Medium energy: up to 8 figures
+    } else if (totalEnergy > 0.2) {
+      targetFigureCount = Math.min(4, Math.floor(totalEnergy * 10)) // Low-medium energy: up to 4 figures
+    } else {
+      targetFigureCount = Math.max(1, Math.floor(totalEnergy * 8)) // Low energy: 1-2 figures
+    }
+
+    // Gradually adjust figure count (prevent sudden jumps)
+    if (targetFigureCount > figureCount) {
+      setFigureCount(prev => Math.min(targetFigureCount, prev + 1))
+    } else if (targetFigureCount < figureCount && figureCount > 1) {
+      setFigureCount(prev => Math.max(1, Math.max(targetFigureCount, prev - 1)))
+    }
+
+    lastAudioDataRef.current = newAudioData
+  }, [figureCount])
 
   const autoSyncBasedOnMusic = (newAudioData) => {
     if (lastAudioDataRef.current.length === 0) {
@@ -156,6 +193,11 @@ function App() {
         const newAudioData = [...dataArray]
         setAudioData(newAudioData)
         
+        // Auto figure control based on music changes
+        if (autoFigureMode) {
+          autoFigureBasedOnMusic(newAudioData)
+        }
+        
         // Auto sync control based on music changes
         if (autoSyncControl) {
           autoSyncBasedOnMusic(newAudioData)
@@ -172,7 +214,7 @@ function App() {
         }
       }
     }
-  }, [analyser, isPlaying, autoSyncControl])
+  }, [analyser, isPlaying, autoSyncControl, autoFigureMode, autoFigureBasedOnMusic])
 
   return (
     <div className={`app ${isDarkMode ? 'dark-mode' : ''}`}>
@@ -253,6 +295,8 @@ function App() {
               <FigureControl 
                 onFigureCountChange={setFigureCount}
                 initialCount={figureCount}
+                autoFigureMode={autoFigureMode}
+                onAutoFigureModeChange={setAutoFigureMode}
               />
               
               <SyncControl 

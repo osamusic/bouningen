@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
 
-function FigureControl({ onFigureCountChange, initialCount = 1 }) {
+function FigureControl({ onFigureCountChange, initialCount = 1, autoFigureMode = false, onAutoFigureModeChange }) {
   const { t, language } = useLanguage()
   const [figureCount, setFigureCount] = useState(initialCount)
 
@@ -9,6 +9,11 @@ function FigureControl({ onFigureCountChange, initialCount = 1 }) {
     const newCount = parseInt(e.target.value)
     setFigureCount(newCount)
     onFigureCountChange(newCount)
+  }
+
+  const handleAutoFigureModeChange = (e) => {
+    const newAutoFigureMode = e.target.checked
+    onAutoFigureModeChange(newAutoFigureMode)
   }
 
   return (
@@ -31,6 +36,24 @@ function FigureControl({ onFigureCountChange, initialCount = 1 }) {
       </div>
       <div className="figure-value">
         {language === 'ja' ? `${figureCount}人でダンス` : `${figureCount} figures dancing`}
+      </div>
+      
+      <label htmlFor="auto-figure-toggle" className="sync-label">
+        <input
+          id="auto-figure-toggle"
+          type="checkbox"
+          checked={autoFigureMode}
+          onChange={handleAutoFigureModeChange}
+          className="sync-checkbox"
+          disabled={!onAutoFigureModeChange}
+        />
+        <span className="sync-slider"></span>
+        <span className="sync-text">
+          {t('autoFigure')}
+        </span>
+      </label>
+      <div className="sync-description">
+        {t('autoFigureDesc')}
       </div>
     </div>
   )
