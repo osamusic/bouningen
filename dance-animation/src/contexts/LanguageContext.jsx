@@ -37,9 +37,10 @@ export const translations = {
     syncOff: 'Sync OFF',
     syncOnDesc: '全員が同期してダンス',
     syncOffDesc: '個別にランダムなダンス',
-    display: '🌙 Display',
-    darkMode: 'Dark Mode',
-    background: 'Background:',
+    display: '🌙 表示',
+    darkMode: 'ダークモード',
+    showParticles: 'パーティクル表示',
+    background: '背景:',
     
     // Background patterns
     bgDefault: 'Default',
@@ -105,6 +106,7 @@ export const translations = {
     // Footer
     copyright: '© 2025 osamusic. All rights reserved.',
     footerDesc: 'DansaBo - 音楽と一緒に棒人間たちのダンスを楽しもう！',
+    githubLink: 'GitHub',
     
     // Language
     language: '言語'
@@ -138,6 +140,7 @@ export const translations = {
     syncOffDesc: 'Individual random dancing',
     display: '🌙 Display',
     darkMode: 'Dark Mode',
+    showParticles: 'Show Particles',
     background: 'Background:',
     
     // Background patterns
@@ -204,6 +207,7 @@ export const translations = {
     // Footer
     copyright: '© 2025 osamusic. All rights reserved.',
     footerDesc: 'DansaBo - Enjoy dancing stick figures with your music!',
+    githubLink: 'GitHub',
     
     // Language
     language: 'Language'

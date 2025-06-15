@@ -1315,6 +1315,31 @@ button:active::before {
   font-weight: 500;
 }
 
+.footer-links {
+  margin-top: 1rem;
+}
+
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, var(--primary-coral), var(--primary-purple));
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.github-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  text-decoration: none;
+  color: white;
+}
+
 .app.dark-mode .app-footer {
   background: linear-gradient(135deg, rgba(108, 92, 231, 0.1) 0%, rgba(255, 107, 107, 0.1) 100%);
   border-top: 1px solid rgba(108, 92, 231, 0.2);

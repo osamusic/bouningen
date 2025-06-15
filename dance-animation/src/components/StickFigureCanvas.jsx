@@ -62,7 +62,7 @@ class StickFigure {
     this.stepPhase = 0
   }
 
-  update(audioData, speedMultiplier = 1.0, isSync = false, syncPhase = 0, syncMove = 'idle') {
+  update(audioData, speedMultiplier = 1.0, isSync = false, syncPhase = 0, syncMove = 'idle', showParticles = true) {
     const bassFreq = audioData.slice(0, 10).reduce((a, b) => a + b) / 10 / 255
     const midFreq = audioData.slice(10, 50).reduce((a, b) => a + b) / 40 / 255
     const highFreq = audioData.slice(50, 100).reduce((a, b) => a + b) / 50 / 255
@@ -130,8 +130,8 @@ class StickFigure {
       pos.alpha = (i / this.trailPositions.length) * 100
     })
     
-    // Particle effects for high energy
-    if (bassFreq > 0.6 && Math.random() < 0.3) {
+    // Particle effects for high energy (only if enabled)
+    if (showParticles && bassFreq > 0.6 && Math.random() < 0.3) {
       this.particles.push({
         x: this.x + this.hipSwing + this.p.random(-20, 20),
         y: this.baseY - this.bounce + this.p.random(-30, 30),
@@ -485,7 +485,7 @@ class StickFigure {
     }
   }
 
-  draw(ctx) {
+  draw(ctx, showParticles = true) {
     // Draw trail effect
     this.trailPositions.forEach((pos) => {
       ctx.save()
@@ -497,16 +497,18 @@ class StickFigure {
       ctx.restore()
     })
     
-    // Draw particles
-    this.particles.forEach(particle => {
-      ctx.save()
-      ctx.globalAlpha = particle.life / 255
-      ctx.fillStyle = `hsl(${(this.dancePhase * 100) % 360}, 80%, 70%)`
-      ctx.beginPath()
-      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.restore()
-    })
+    // Draw particles (only if enabled)
+    if (showParticles) {
+      this.particles.forEach(particle => {
+        ctx.save()
+        ctx.globalAlpha = particle.life / 255
+        ctx.fillStyle = `hsl(${(this.dancePhase * 100) % 360}, 80%, 70%)`
+        ctx.beginPath()
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.restore()
+      })
+    }
     
     ctx.save()
     
@@ -897,7 +899,7 @@ class StickFigure {
   }
 }
 
-const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureCount = 1, isSync = false, personalityBalance, isDarkMode = false, backgroundPattern = 'default', aspectRatio = '16:9' }, ref) => {
+const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureCount = 1, isSync = false, personalityBalance, isDarkMode = false, backgroundPattern = 'default', aspectRatio = '16:9', showParticles = true }, ref) => {
   const canvasRef = useRef(null)
   const stickFiguresRef = useRef([])
   const p5InstanceRef = useRef(null)
@@ -1041,16 +1043,16 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
       
       switch (backgroundPattern) {
         case 'cosmic':
-          renderCosmicBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
+          renderCosmicBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode, showParticles)
           break
         case 'dreamlike':
-          renderDreamlikeBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
+          renderDreamlikeBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode, showParticles)
           break
         case 'geometric':
           renderGeometricBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
           break
         case 'waves':
-          renderWavesBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
+          renderWavesBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode, showParticles)
           break
         case 'clouds':
           renderCloudsBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
@@ -1062,10 +1064,10 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
           renderMatrixBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time)
           break
         case 'rainbow':
-          renderRainbowBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
+          renderRainbowBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode, showParticles)
           break
         case 'fire':
-          renderFireBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time)
+          renderFireBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, showParticles)
           break
         default:
           renderDefaultBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
@@ -1126,7 +1128,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
       ctx.fillRect(0, 0, canvas.width, canvas.height)
     }
     
-    const renderCosmicBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode) => {
+    const renderCosmicBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode, showParticles = true) => {
       // Deep space base
       const baseHue = 240 + time * 5
       const baseBg = isDarkMode ? '#0a0a1a' : '#1a1a2e'
@@ -1153,22 +1155,24 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         }
       }
       
-      // Stars
-      const starCount = 50 + Math.floor(highFreq * 30)
-      for (let i = 0; i < starCount; i++) {
-        const x = (time * 2 + i * 23.7) % canvas.width
-        const y = (time * 1.5 + i * 17.3) % canvas.height
-        const brightness = 0.3 + Math.sin(time * 3 + i) * 0.7
-        const size = 1 + highFreq * 3
-        
-        ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`
-        ctx.beginPath()
-        ctx.arc(x, y, size, 0, Math.PI * 2)
-        ctx.fill()
+      // Stars (only if particles enabled)
+      if (showParticles) {
+        const starCount = 50 + Math.floor(highFreq * 30)
+        for (let i = 0; i < starCount; i++) {
+          const x = (time * 2 + i * 23.7) % canvas.width
+          const y = (time * 1.5 + i * 17.3) % canvas.height
+          const brightness = 0.3 + Math.sin(time * 3 + i) * 0.7
+          const size = 1 + highFreq * 3
+          
+          ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`
+          ctx.beginPath()
+          ctx.arc(x, y, size, 0, Math.PI * 2)
+          ctx.fill()
+        }
       }
       
-      // Galaxy spiral
-      if (bassFreq > 0.4) {
+      // Galaxy spiral (only if particles enabled)
+      if (showParticles && bassFreq > 0.4) {
         ctx.save()
         ctx.translate(canvas.width / 2, canvas.height / 2)
         ctx.rotate(time * 0.1)
@@ -1188,7 +1192,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
       }
     }
     
-    const renderDreamlikeBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode) => {
+    const renderDreamlikeBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode, showParticles = true) => {
       // Soft gradient base
       const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
       const baseHue = 300 + Math.sin(time * 0.5) * 60
@@ -1224,8 +1228,8 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         ctx.fill()
       }
       
-      // Dreamy particles
-      if (highFreq > 0.3) {
+      // Dreamy particles (only if particles enabled)
+      if (showParticles && highFreq > 0.3) {
         const particleCount = Math.floor(highFreq * 20)
         for (let i = 0; i < particleCount; i++) {
           const x = Math.sin(time * 2 + i * 0.1) * (canvas.width * 0.4) + canvas.width / 2
@@ -1329,7 +1333,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
       }
     }
     
-    const renderWavesBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode) => {
+    const renderWavesBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode, showParticles = true) => {
       // Ocean gradient
       const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
       const baseHue = 200 + Math.sin(time * 0.3) * 40
@@ -1376,8 +1380,8 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         ctx.fill()
       }
       
-      // Foam particles
-      if (highFreq > 0.3) {
+      // Foam particles (only if particles enabled)
+      if (showParticles && highFreq > 0.3) {
         const foamCount = Math.floor(highFreq * 30)
         for (let i = 0; i < foamCount; i++) {
           const x = (time * 80 + i * 25) % (canvas.width + 20) - 10
@@ -1523,7 +1527,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
       }
     }
     
-    const renderRainbowBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode) => {
+    const renderRainbowBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode, showParticles = true) => {
       // Base color
       ctx.fillStyle = isDarkMode ? '#0a0a0a' : '#fafafa'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
@@ -1549,8 +1553,9 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         ctx.fill()
       }
       
-      // Rainbow particles
-      const particleCount = Math.floor(20 + midFreq * 30)
+      // Rainbow particles (only if particles enabled)
+      if (showParticles) {
+        const particleCount = Math.floor(20 + midFreq * 30)
       for (let i = 0; i < particleCount; i++) {
         const x = Math.random() * canvas.width
         const y = (time * 50 + i * 30) % canvas.height
@@ -1561,16 +1566,18 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         ctx.beginPath()
         ctx.arc(x, y, size, 0, Math.PI * 2)
         ctx.fill()
+        }
       }
     }
     
-    const renderFireBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time) => {
+    const renderFireBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, showParticles = true) => {
       // Dark background
       ctx.fillStyle = '#0a0000'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       
-      // Fire particles
-      const particleCount = 100 + Math.floor(bassFreq * 100)
+      // Fire particles (only if particles enabled)
+      if (showParticles) {
+        const particleCount = 100 + Math.floor(bassFreq * 100)
       
       for (let i = 0; i < particleCount; i++) {
         const x = Math.random() * canvas.width
@@ -1609,6 +1616,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         ctx.beginPath()
         ctx.arc(waveX, y, size * (1 - heightRatio * 0.7), 0, Math.PI * 2)
         ctx.fill()
+      }
       }
       
       // Glow effect
@@ -1683,8 +1691,8 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         }
       }
       
-      // Floating particles for mids
-      if (midEnergy > 0.4) {
+      // Floating particles for mids (only if particles enabled)
+      if (showParticles && midEnergy > 0.4) {
         for (let i = 0; i < midEnergy * 20; i++) {
           const x = (Date.now() * 0.01 + i * 100) % canvas.width
           const y = (Math.sin(Date.now() * 0.005 + i) * 50 + canvas.height / 2)
@@ -1781,15 +1789,15 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
       }
       
       stickFiguresRef.current.forEach(figure => {
-        figure.update(audioData, animationSpeed, currentSyncState, syncPhaseRef.current, syncMoveRef.current)
+        figure.update(audioData, animationSpeed, currentSyncState, syncPhaseRef.current, syncMoveRef.current, showParticles)
       })
     }
     
     stickFiguresRef.current.forEach(figure => {
-      figure.draw(ctx)
+      figure.draw(ctx, showParticles)
     })
     
-  }, [audioData, animationSpeed, figureCount, isSync, personalityBalance, isDarkMode, backgroundPattern, aspectRatio])
+  }, [audioData, animationSpeed, figureCount, isSync, personalityBalance, isDarkMode, backgroundPattern, aspectRatio, showParticles])
 
   return (
     <canvas 

@@ -29,6 +29,7 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [backgroundPattern, setBackgroundPattern] = useState('default')
   const [aspectRatio, setAspectRatio] = useState('16:9')
+  const [showParticles, setShowParticles] = useState(true)
   const animationRef = useRef()
   const canvasRef = useRef()
 
@@ -100,6 +101,7 @@ function App() {
             isDarkMode={isDarkMode}
             backgroundPattern={backgroundPattern}
             aspectRatio={aspectRatio}
+            showParticles={showParticles}
           />
           <AudioVisualizer audioData={audioData} />
         </div>
@@ -137,6 +139,15 @@ function App() {
                 onChange={(e) => setIsDarkMode(e.target.checked)}
               />
               {t('darkMode')}
+            </label>
+            
+            <label className="control-item">
+              <input
+                type="checkbox"
+                checked={showParticles}
+                onChange={(e) => setShowParticles(e.target.checked)}
+              />
+              {t('showParticles')}
             </label>
             
             <div className="background-selector">
@@ -178,6 +189,16 @@ function App() {
         <div className="footer-content">
           <p className="copyright">{t('copyright')}</p>
           <p className="footer-description">{t('footerDesc')}</p>
+          <div className="footer-links">
+            <a 
+              href="https://github.com/osamusic/bouningen" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="github-link"
+            >
+              {t('githubLink')}
+            </a>
+          </div>
         </div>
       </footer>
     </div>
