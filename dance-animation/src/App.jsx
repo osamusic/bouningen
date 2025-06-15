@@ -19,7 +19,7 @@ function App() {
   const [animationSpeed, setAnimationSpeed] = useState(1.0)
   const [figureCount, setFigureCount] = useState(1)
   const [isSync, setIsSync] = useState(false)
-  const [autoSyncControl, setAutoSyncControl] = useState(false)
+  const [autoSyncControl, setAutoSyncControl] = useState(true)
   const [personalityBalance, setPersonalityBalance] = useState({
     breakdancer: 20,
     waver: 20,
