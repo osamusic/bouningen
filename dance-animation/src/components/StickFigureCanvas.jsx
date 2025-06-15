@@ -647,7 +647,7 @@ class StickFigure {
         ctx.globalAlpha = particle.life / 255
         ctx.fillStyle = `hsl(${this.colorHue}, 80%, 70%)`
         ctx.beginPath()
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
+        ctx.arc(particle.x, particle.y, Math.max(0, particle.size), 0, Math.PI * 2)
         ctx.fill()
         ctx.restore()
       })
@@ -1294,7 +1294,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         for (let i = 0; i < nebulaeCount; i++) {
           const x = (time * 10 + i * 100) % (canvas.width + 200) - 100
           const y = (Math.sin(time * 0.5 + i) * 50 + canvas.height / 2)
-          const size = 80 + totalEnergy * 120
+          const size = Math.max(1, 80 + totalEnergy * 120)
           
           const gradient = ctx.createRadialGradient(x, y, 0, x, y, size)
           gradient.addColorStop(0, `hsla(${baseHue + i * 30}, 80%, 60%, ${totalEnergy * 0.4})`)
@@ -1315,7 +1315,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
           const x = (time * 2 + i * 23.7) % canvas.width
           const y = (time * 1.5 + i * 17.3) % canvas.height
           const brightness = 0.3 + Math.sin(time * 3 + i) * 0.7
-          const size = 1 + highFreq * 3
+          const size = Math.max(0.1, 1 + highFreq * 3)
           
           ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`
           ctx.beginPath()
@@ -1387,7 +1387,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         for (let i = 0; i < particleCount; i++) {
           const x = Math.sin(time * 2 + i * 0.1) * (canvas.width * 0.4) + canvas.width / 2
           const y = (time * 25 + i * 50) % (canvas.height + 50) - 25
-          const size = 1 + Math.sin(time * 4 + i) * 2
+          const size = Math.max(0.1, 1 + Math.sin(time * 4 + i) * 2)
           
           ctx.fillStyle = `hsla(${baseHue + i * 20}, 70%, 85%, ${highFreq * 0.8})`
           ctx.beginPath()
@@ -1713,7 +1713,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         const x = Math.random() * canvas.width
         const y = (time * 50 + i * 30) % canvas.height
         const hue = (x / canvas.width * 360 + time * 50) % 360
-        const size = 2 + highFreq * 8
+        const size = Math.max(0.1, 2 + highFreq * 8)
         
         ctx.fillStyle = `hsla(${hue}, 100%, 50%, ${0.8})`
         ctx.beginPath()
@@ -1767,7 +1767,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a * (1 - heightRatio)})`
         ctx.beginPath()
-        ctx.arc(waveX, y, size * (1 - heightRatio * 0.7), 0, Math.PI * 2)
+        ctx.arc(waveX, y, Math.max(0, size * (1 - heightRatio * 0.7)), 0, Math.PI * 2)
         ctx.fill()
       }
       }
