@@ -1,4 +1,57 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, Component } from 'react'
+
+// Simple Error Boundary component
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error }
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Canvas Error:', error, errorInfo)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          background: '#ff4444',
+          color: 'white',
+          padding: '20px',
+          borderRadius: '8px',
+          textAlign: 'center',
+          minHeight: '200px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center'
+        }}>
+          <h3>Canvas Error</h3>
+          <p>Something went wrong with the animation canvas.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              background: 'white',
+              color: '#ff4444',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginTop: '10px'
+            }}
+          >
+            Reload Page
+          </button>
+        </div>
+      )
+    }
+
+    return this.props.children
+  }
+}
 import './App.css'
 import StickFigureCanvas from './components/StickFigureCanvas'
 import AudioControls from './components/AudioControls'
@@ -39,9 +92,17 @@ function App() {
   const syncChangeCountdownRef = useRef(0)
   const currentSyncStateRef = useRef(false)
 
+  const figureUpdateCooldownRef = useRef(0)
+  
   const autoFigureBasedOnMusic = useCallback((newAudioData) => {
     if (lastAudioDataRef.current.length === 0) {
       lastAudioDataRef.current = newAudioData
+      return
+    }
+
+    // Add cooldown to prevent rapid updates
+    if (figureUpdateCooldownRef.current > 0) {
+      figureUpdateCooldownRef.current--
       return
     }
 
@@ -66,14 +127,19 @@ function App() {
     }
 
     // Gradually adjust figure count (prevent sudden jumps)
-    if (targetFigureCount > figureCount) {
-      setFigureCount(prev => Math.min(targetFigureCount, prev + 1))
-    } else if (targetFigureCount < figureCount && figureCount > 1) {
-      setFigureCount(prev => Math.max(1, Math.max(targetFigureCount, prev - 1)))
-    }
+    setFigureCount(prevCount => {
+      if (targetFigureCount > prevCount) {
+        figureUpdateCooldownRef.current = 30 // 0.5 second cooldown at 60fps
+        return Math.min(targetFigureCount, prevCount + 1)
+      } else if (targetFigureCount < prevCount && prevCount > 1) {
+        figureUpdateCooldownRef.current = 30
+        return Math.max(1, Math.max(targetFigureCount, prevCount - 1))
+      }
+      return prevCount
+    })
 
     lastAudioDataRef.current = newAudioData
-  }, [figureCount])
+  }, [])
 
   const autoSyncBasedOnMusic = (newAudioData) => {
     if (lastAudioDataRef.current.length === 0) {
@@ -261,18 +327,20 @@ function App() {
                 onClick={() => setIsCanvasModalOpen(true)}
                 title={t('clickToEnlarge')}
               >
-                <StickFigureCanvas 
-                  ref={canvasRef}
-                  audioData={audioData} 
-                  animationSpeed={animationSpeed}
-                  figureCount={figureCount}
-                  isSync={isSync}
-                  personalityBalance={personalityBalance}
-                  isDarkMode={isDarkMode}
-                  backgroundPattern={backgroundPattern}
-                  aspectRatio={aspectRatio}
-                  showParticles={showParticles}
-                />
+                <ErrorBoundary>
+                  <StickFigureCanvas 
+                    ref={canvasRef}
+                    audioData={audioData} 
+                    animationSpeed={animationSpeed}
+                    figureCount={figureCount}
+                    isSync={isSync}
+                    personalityBalance={personalityBalance}
+                    isDarkMode={isDarkMode}
+                    backgroundPattern={backgroundPattern}
+                    aspectRatio={aspectRatio}
+                    showParticles={showParticles}
+                  />
+                </ErrorBoundary>
               </div>
               <AudioVisualizer audioData={audioData} />
             </div>
@@ -375,17 +443,19 @@ function App() {
                 ×
               </button>
               <div className="canvas-modal-canvas">
-                <StickFigureCanvas 
-                  audioData={audioData} 
-                  animationSpeed={animationSpeed}
-                  figureCount={figureCount}
-                  isSync={isSync}
-                  personalityBalance={personalityBalance}
-                  isDarkMode={isDarkMode}
-                  backgroundPattern={backgroundPattern}
-                  aspectRatio={aspectRatio}
-                  showParticles={showParticles}
-                />
+                <ErrorBoundary>
+                  <StickFigureCanvas 
+                    audioData={audioData} 
+                    animationSpeed={animationSpeed}
+                    figureCount={figureCount}
+                    isSync={isSync}
+                    personalityBalance={personalityBalance}
+                    isDarkMode={isDarkMode}
+                    backgroundPattern={backgroundPattern}
+                    aspectRatio={aspectRatio}
+                    showParticles={showParticles}
+                  />
+                </ErrorBoundary>
               </div>
             </div>
           </div>

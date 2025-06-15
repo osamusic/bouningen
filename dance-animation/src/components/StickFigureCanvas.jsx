@@ -1058,6 +1058,24 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
     if (!canvas) return
     
     const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    
+    // Error handling wrapper
+    const safeRender = (renderFunction) => {
+      try {
+        renderFunction()
+      } catch (error) {
+        console.error('Canvas rendering error:', error)
+        // Draw error message on canvas instead of white screen
+        ctx.fillStyle = '#ff4444'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.fillStyle = '#ffffff'
+        ctx.font = '16px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText('Rendering Error - Please refresh', canvas.width / 2, canvas.height / 2)
+        ctx.fillText(`Error: ${error.message}`, canvas.width / 2, canvas.height / 2 + 25)
+      }
+    }
     
     // Dynamic canvas size based on figure count and aspect ratio
     if (aspectRatio === '9:16') {
@@ -1103,14 +1121,15 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
       }
     }
     
-    // Create or update stick figures based on figureCount and personality balance
-    const needsRecreation = stickFiguresRef.current.length !== figureCount || 
-                            !stickFiguresRef.current[0] || 
-                            (stickFiguresRef.current[0] && stickFiguresRef.current[0].aspectRatio !== aspectRatio)
-    if (needsRecreation) {
-      stickFiguresRef.current = []
-      
-      // Generate personality distribution based on balance
+    safeRender(() => {
+      // Create or update stick figures based on figureCount and personality balance
+      const needsRecreation = stickFiguresRef.current.length !== figureCount || 
+                              !stickFiguresRef.current[0] || 
+                              (stickFiguresRef.current[0] && stickFiguresRef.current[0].aspectRatio !== aspectRatio)
+      if (needsRecreation) {
+        stickFiguresRef.current = []
+        
+        // Generate personality distribution based on balance
       const personalities = ['breakdancer', 'waver', 'jumper', 'spinner', 'groover']
       const distribution = []
       
@@ -1162,8 +1181,9 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         }
         
         stickFiguresRef.current.push(figure)
+        }
       }
-    }
+    })
     
     // Dynamic background based on audio energy, mode, and pattern
     const renderBackground = () => {
@@ -1926,6 +1946,10 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
       })
     }
     
+    // Background rendering
+    renderBackground()
+    
+    // Draw figures with error handling
     stickFiguresRef.current.forEach(figure => {
       figure.draw(ctx, showParticles)
     })
