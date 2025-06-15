@@ -30,6 +30,7 @@ function App() {
   const [backgroundPattern, setBackgroundPattern] = useState('default')
   const [aspectRatio, setAspectRatio] = useState('16:9')
   const [showParticles, setShowParticles] = useState(true)
+  const [isCanvasModalOpen, setIsCanvasModalOpen] = useState(false)
   const animationRef = useRef()
   const canvasRef = useRef()
 
@@ -93,18 +94,24 @@ function App() {
         <div className="main-layout">
           <div className="canvas-section">
             <div className="canvas-container">
-              <StickFigureCanvas 
-                ref={canvasRef}
-                audioData={audioData} 
-                animationSpeed={animationSpeed}
-                figureCount={figureCount}
-                isSync={isSync}
-                personalityBalance={personalityBalance}
-                isDarkMode={isDarkMode}
-                backgroundPattern={backgroundPattern}
-                aspectRatio={aspectRatio}
-                showParticles={showParticles}
-              />
+              <div 
+                className="canvas-wrapper"
+                onClick={() => setIsCanvasModalOpen(true)}
+                title={t('clickToEnlarge')}
+              >
+                <StickFigureCanvas 
+                  ref={canvasRef}
+                  audioData={audioData} 
+                  animationSpeed={animationSpeed}
+                  figureCount={figureCount}
+                  isSync={isSync}
+                  personalityBalance={personalityBalance}
+                  isDarkMode={isDarkMode}
+                  backgroundPattern={backgroundPattern}
+                  aspectRatio={aspectRatio}
+                  showParticles={showParticles}
+                />
+              </div>
               <AudioVisualizer audioData={audioData} />
             </div>
           </div>
@@ -189,6 +196,34 @@ function App() {
           aspectRatio={aspectRatio}
           onAspectRatioChange={setAspectRatio}
         />
+        
+        {/* Canvas Modal */}
+        {isCanvasModalOpen && (
+          <div className="canvas-modal" onClick={() => setIsCanvasModalOpen(false)}>
+            <div className="canvas-modal-content" onClick={(e) => e.stopPropagation()}>
+              <button 
+                className="canvas-modal-close"
+                onClick={() => setIsCanvasModalOpen(false)}
+                title={t('close')}
+              >
+                ×
+              </button>
+              <div className="canvas-modal-canvas">
+                <StickFigureCanvas 
+                  audioData={audioData} 
+                  animationSpeed={animationSpeed}
+                  figureCount={figureCount}
+                  isSync={isSync}
+                  personalityBalance={personalityBalance}
+                  isDarkMode={isDarkMode}
+                  backgroundPattern={backgroundPattern}
+                  aspectRatio={aspectRatio}
+                  showParticles={showParticles}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </main>
       
       <footer className="app-footer">

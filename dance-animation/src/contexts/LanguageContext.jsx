@@ -23,6 +23,8 @@ export const translations = {
     play: '▶️ 再生',
     stop: '⏹️ 停止',
     volume: '音量',
+    clickToEnlarge: 'クリックして拡大表示',
+    close: '閉じる',
     
     // Controls
     speed: '⚡ アニメーション速度',
@@ -124,6 +126,8 @@ export const translations = {
     play: '▶️ Play',
     stop: '⏹️ Stop',
     volume: 'Volume',
+    clickToEnlarge: 'Click to enlarge',
+    close: 'Close',
     
     // Controls
     speed: '⚡ Animation Speed',
