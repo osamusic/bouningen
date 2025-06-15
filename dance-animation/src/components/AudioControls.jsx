@@ -80,17 +80,32 @@ function AudioControls({ setAudioContext, setAnalyser, setIsPlaying, isPlaying }
     }
   }
 
+  const handleLabelClick = (e) => {
+    // Ensure click works on iOS
+    e.preventDefault()
+    const fileInput = document.getElementById('audio-file')
+    if (fileInput) {
+      fileInput.click()
+    }
+  }
+
   return (
     <div className="audio-controls">
       <h3>{t('audioControls')}</h3>
       <div className="file-input-wrapper">
         <input 
           type="file" 
-          accept="audio/*" 
+          accept="audio/*,audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/m4a,audio/aac" 
           onChange={handleFileUpload}
           id="audio-file"
+          multiple={false}
         />
-        <label htmlFor="audio-file" className="file-input-label">
+        <label 
+          htmlFor="audio-file" 
+          className="file-input-label"
+          onClick={handleLabelClick}
+          onTouchStart={() => {}} 
+        >
           <span className="file-icon">🎵</span>
           <span className="file-text">
             {fileName || t('selectMusic')}

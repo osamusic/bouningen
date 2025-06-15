@@ -681,6 +681,9 @@ button:active::before {
 .file-input-wrapper input[type="file"] {
   position: absolute;
   left: -9999px;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
 .file-input-label {
@@ -701,6 +704,13 @@ button:active::before {
   min-height: 80px;
   position: relative;
   overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .file-input-label::before {
