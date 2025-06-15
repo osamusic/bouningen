@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
 
-function SyncControl({ onSyncChange, initialSync = false }) {
+function SyncControl({ onSyncChange, initialSync = false, autoSyncControl = false, onAutoSyncChange }) {
   const { t } = useLanguage()
   const [isSync, setIsSync] = useState(initialSync)
 
@@ -9,6 +9,11 @@ function SyncControl({ onSyncChange, initialSync = false }) {
     const newSync = e.target.checked
     setIsSync(newSync)
     onSyncChange(newSync)
+  }
+
+  const handleAutoSyncChange = (e) => {
+    const newAutoSync = e.target.checked
+    onAutoSyncChange(newAutoSync)
   }
 
   return (
@@ -29,6 +34,24 @@ function SyncControl({ onSyncChange, initialSync = false }) {
       </label>
       <div className="sync-description">
         {isSync ? t('syncOnDesc') : t('syncOffDesc')}
+      </div>
+      
+      <label htmlFor="auto-sync-toggle" className="sync-label">
+        <input
+          id="auto-sync-toggle"
+          type="checkbox"
+          checked={autoSyncControl}
+          onChange={handleAutoSyncChange}
+          className="sync-checkbox"
+          disabled={!onAutoSyncChange}
+        />
+        <span className="sync-slider"></span>
+        <span className="sync-text">
+          {t('autoSync')}
+        </span>
+      </label>
+      <div className="sync-description">
+        {t('autoSyncDesc')}
       </div>
     </div>
   )

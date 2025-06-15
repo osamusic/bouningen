@@ -19,6 +19,7 @@ function App() {
   const [animationSpeed, setAnimationSpeed] = useState(1.0)
   const [figureCount, setFigureCount] = useState(1)
   const [isSync, setIsSync] = useState(false)
+  const [autoSyncControl, setAutoSyncControl] = useState(false)
   const [personalityBalance, setPersonalityBalance] = useState({
     breakdancer: 20,
     waver: 20,
@@ -33,6 +34,126 @@ function App() {
   const [isCanvasModalOpen, setIsCanvasModalOpen] = useState(false)
   const animationRef = useRef()
   const canvasRef = useRef()
+  const lastAudioDataRef = useRef([])
+  const syncChangeCountdownRef = useRef(0)
+  const currentSyncStateRef = useRef(false)
+
+  const autoSyncBasedOnMusic = (newAudioData) => {
+    if (lastAudioDataRef.current.length === 0) {
+      lastAudioDataRef.current = newAudioData
+      return
+    }
+
+    // Calculate current audio characteristics
+    const bassFreq = newAudioData.slice(0, 10).reduce((a, b) => a + b) / 10 / 255
+    const midFreq = newAudioData.slice(10, 50).reduce((a, b) => a + b) / 40 / 255
+    const highFreq = newAudioData.slice(50, 100).reduce((a, b) => a + b) / 50 / 255
+    const totalEnergy = bassFreq + midFreq + highFreq
+
+    // Calculate previous audio characteristics
+    const prevBassFreq = lastAudioDataRef.current.slice(0, 10).reduce((a, b) => a + b) / 10 / 255
+    const prevMidFreq = lastAudioDataRef.current.slice(10, 50).reduce((a, b) => a + b) / 40 / 255
+    const prevHighFreq = lastAudioDataRef.current.slice(50, 100).reduce((a, b) => a + b) / 50 / 255
+
+    // Detect significant changes in music
+    const bassChange = Math.abs(bassFreq - prevBassFreq)
+    const midChange = Math.abs(midFreq - prevMidFreq)
+    const highChange = Math.abs(highFreq - prevHighFreq)
+    const totalChange = bassChange + midChange + highChange
+
+    // Detect beat drops, breakdowns, or major musical changes
+    const isBeatDrop = bassFreq > 0.7 && bassChange > 0.3
+    const isBreakdown = totalEnergy < 0.3 && totalChange > 0.2
+    const isBuildUp = totalEnergy > 0.6 && totalChange > 0.25
+    const isMusicalChange = totalChange > 0.4
+    
+    // Detect volume changes (more common than silence)
+    const prevTotalEnergy = prevBassFreq + prevMidFreq + prevHighFreq
+    const energyChange = Math.abs(totalEnergy - prevTotalEnergy)
+    
+    // Detect significant volume drops and increases
+    const isVolumeDropSignificant = totalEnergy < prevTotalEnergy * 0.6 && prevTotalEnergy > 0.3
+    const isVolumeIncreaseSignificant = totalEnergy > prevTotalEnergy * 1.5 && totalEnergy > 0.3
+    const isSongBreak = isVolumeDropSignificant || isVolumeIncreaseSignificant
+    
+    // Detect tempo/rhythm changes
+    const rhythmChange = Math.abs(bassFreq - prevBassFreq) > 0.4
+    const isTempoChange = rhythmChange && totalEnergy > 0.3
+
+    // Countdown system to prevent too frequent changes
+    if (syncChangeCountdownRef.current > 0) {
+      syncChangeCountdownRef.current--
+    }
+
+    // Decide when to toggle sync
+    let shouldToggleSync = false
+    
+    if (syncChangeCountdownRef.current === 0) {
+      if (isBeatDrop || isBuildUp) {
+        // High energy moments favor sync
+        shouldToggleSync = true
+        const syncProbability = 0.8
+        const newSyncState = Math.random() < syncProbability
+        if (newSyncState !== currentSyncStateRef.current) {
+          setIsSync(newSyncState)
+          currentSyncStateRef.current = newSyncState
+          syncChangeCountdownRef.current = 60 // 1 second at 60fps
+        }
+      } else if (isBreakdown) {
+        // Breakdowns favor individual movement
+        shouldToggleSync = true
+        const syncProbability = 0.2
+        const newSyncState = Math.random() < syncProbability
+        if (newSyncState !== currentSyncStateRef.current) {
+          setIsSync(newSyncState)
+          currentSyncStateRef.current = newSyncState
+          syncChangeCountdownRef.current = 60
+        }
+      } else if (isSongBreak) {
+        // Volume changes are good moments to change sync
+        shouldToggleSync = true
+        let syncProbability = 0.6
+        
+        // Volume drops favor individual movement (like quiet verses)
+        if (isVolumeDropSignificant) {
+          syncProbability = 0.3
+        }
+        // Volume increases favor sync (like choruses)
+        else if (isVolumeIncreaseSignificant) {
+          syncProbability = 0.8
+        }
+        
+        const newSyncState = Math.random() < syncProbability
+        if (newSyncState !== currentSyncStateRef.current) {
+          setIsSync(newSyncState)
+          currentSyncStateRef.current = newSyncState
+          syncChangeCountdownRef.current = 30 // Shorter cooldown for volume changes
+        }
+      } else if (isTempoChange) {
+        // Tempo changes suggest new musical section
+        shouldToggleSync = true
+        const syncProbability = 0.7 // Favor sync for tempo changes
+        const newSyncState = Math.random() < syncProbability
+        if (newSyncState !== currentSyncStateRef.current) {
+          setIsSync(newSyncState)
+          currentSyncStateRef.current = newSyncState
+          syncChangeCountdownRef.current = 45 // Medium cooldown
+        }
+      } else if (isMusicalChange) {
+        // General musical changes have balanced probability
+        shouldToggleSync = true
+        const syncProbability = 0.5
+        const newSyncState = Math.random() < syncProbability
+        if (newSyncState !== currentSyncStateRef.current) {
+          setIsSync(newSyncState)
+          currentSyncStateRef.current = newSyncState
+          syncChangeCountdownRef.current = 90 // 1.5 seconds
+        }
+      }
+    }
+
+    lastAudioDataRef.current = newAudioData
+  }
 
   useEffect(() => {
     if (analyser && isPlaying) {
@@ -40,7 +161,14 @@ function App() {
       
       const updateAudioData = () => {
         analyser.getByteFrequencyData(dataArray)
-        setAudioData([...dataArray])
+        const newAudioData = [...dataArray]
+        setAudioData(newAudioData)
+        
+        // Auto sync control based on music changes
+        if (autoSyncControl) {
+          autoSyncBasedOnMusic(newAudioData)
+        }
+        
         animationRef.current = requestAnimationFrame(updateAudioData)
       }
       
@@ -138,6 +266,8 @@ function App() {
               <SyncControl 
                 onSyncChange={setIsSync}
                 initialSync={isSync}
+                autoSyncControl={autoSyncControl}
+                onAutoSyncChange={setAutoSyncControl}
               />
               
               {/* Display Controls */}
