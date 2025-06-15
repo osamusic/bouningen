@@ -1,12 +1,235 @@
-# React + Vite
+# DansaBo - ダンスする棒人間たち
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<div align="center">
 
-Currently, two official plugins are available:
+🕺 **音楽に合わせて踊る棒人間たちのアニメーションアプリ** 🎵
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[**English**](./README_EN.md) | **日本語**
 
-## Expanding the ESLint configuration
+[![React](https://img.shields.io/badge/React-19.1.0-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-6.3.5-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Privacy](https://img.shields.io/badge/Privacy-100%25_Client_Side-00D26A?style=flat-square&logo=shield)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
+[![No Server](https://img.shields.io/badge/Server-Not_Required-FF6B6B?style=flat-square&logo=x)](https://jamstack.org/)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+</div>
+
+## 🎯 特徴
+
+### 🎵 **音楽連動アニメーション**
+- 音楽ファイルをアップロードして棒人間がリアルタイムでダンス
+- 低音・中音・高音の周波数解析による自然な動き
+- MP3、WAV、M4A など主要な音楽フォーマットに対応
+
+### 🎨 **豊富な背景パターン**
+- **Default**: シンプルなグラデーション背景
+- **🌌 Cosmic**: 宇宙空間のような幻想的な背景
+- **💫 Dreamlike**: 夢のような浮遊する光の粒子
+- **🔷 Geometric**: 幾何学的なパターン
+- **🌊 Waves**: 波のような流れるアニメーション
+- **☁️ Clouds**: 動く雲と空のグラデーション
+- **💡 Neon**: ネオングリッドとカラフルな図形
+- **🔢 Matrix**: マトリックス風の文字の雨
+- **🌈 Rainbow**: 虹色の波とパーティクル
+- **🔥 Fire**: リアルな炎のエフェクト
+
+### 🎭 **高度なカスタマイズ**
+- **棒人間の数**: 1〜100体まで設定可能
+- **ダンス同期**: 全員同期 or 個別ランダム
+- **アニメーション速度**: 0.1倍〜3倍まで調整
+- **個性バランス**: 5つのダンススタイルの比率調整
+  - 🔥 ブレイカー（ブレイクダンス）
+  - 🌊 ウェーバー（ウェーブダンス）
+  - ⚡ ジャンパー（ジャンプダンス）
+  - 🌀 スピナー（スピンダンス）
+  - 🎵 グルーバー（グルーブダンス）
+
+### 🎥 **動画録画機能**
+- **アスペクト比**: 16:9（横長）/ 9:16（縦長）対応
+- **画質**: 480p / 720p / 1080p 選択可能
+- **フォーマット**: MP4（推奨）/ WebM
+- **録画モード**: 手動停止 / 自動停止（5〜30秒）
+- TikTok、Instagram Reels向けの縦長動画も簡単作成
+
+### 🌙 **ダークモード対応**
+- ライト・ダークテーマの切り替え
+- 背景パターンもテーマに応じて自動調整
+
+### 🔒 **プライバシー保護**
+- **🚫 サーバー送信なし**: 音楽ファイルや動画は一切サーバーに送信されません
+- **💻 ローカル処理**: 全ての音声解析・動画生成はお使いのブラウザ内で完結
+- **🌐 オフライン対応**: 一度ページを開けば、インターネット接続なしでも動作
+- **🗑️ 自動削除**: ファイルはメモリ内でのみ処理され、ページを閉じると完全削除
+- **📊 データ収集なし**: 個人情報・使用データの収集は一切行いません
+- **🔐 著作権安心**: あなたの音楽ファイルは外部に流出することがありません
+
+> **💡 技術的補足**: DansaBoは[Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)と[Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)を使用した100%クライアントサイドアプリケーションです。
+
+## 🚀 はじめ方
+
+### インストール
+
+```bash
+# リポジトリをクローン
+git clone <repository-url>
+cd dance-animation
+
+# 依存関係をインストール
+npm install
+```
+
+### 開発サーバーの起動
+
+```bash
+npm run dev
+```
+
+ブラウザで http://localhost:5173/ にアクセス
+
+## 🛠️ 開発コマンド
+
+```bash
+# 開発サーバー起動
+npm run dev
+
+# 本番ビルド
+npm run build
+
+# ビルド結果のプレビュー
+npm run preview
+
+# ESLintによるコード品質チェック
+npm run lint
+
+# TypeScriptによる型チェック
+npm run typecheck
+```
+
+## 📱 使い方
+
+1. **音楽ファイルをアップロード**
+   - 「🎵 音楽ファイルを選択してください」ボタンをクリック
+   - MP3、WAV、M4A などの音楽ファイルを選択
+
+2. **設定をカスタマイズ**
+   - 棒人間の数を調整
+   - ダンス同期のON/OFF
+   - アニメーション速度を変更
+   - 背景パターンを選択
+
+3. **音楽を再生してダンスを楽しむ**
+   - ▶️ 再生ボタンで音楽スタート
+   - 棒人間たちが音楽に合わせてダンス
+
+4. **動画として保存**（オプション）
+   - アスペクト比・画質・フォーマットを選択
+   - 🔴 録画開始ボタンで録画スタート
+   - 💾 ダウンロードで動画保存
+
+## 🎨 技術スタック
+
+- **フロントエンド**: React 19.1.0 + Vite 6.3.5
+- **音声処理**: Web Audio API
+- **描画**: HTML5 Canvas
+- **動画録画**: MediaRecorder API
+- **スタイル**: CSS3 (Flexbox, Grid, Animations)
+- **型チェック**: TypeScript 5.8.3
+- **コード品質**: ESLint
+
+## 🎵 音声解析の仕組み
+
+DansaBoは**Web Audio API**の`AnalyserNode`を使用してリアルタイム音声解析を行います：
+
+1. **FFTサイズ256**で周波数スペクトラムを取得
+2. **3つの周波数帯域**に分割：
+   - **低音域（0-10）**: 縦方向のバウンスと脚の動き
+   - **中音域（10-50）**: 腕の振りと腰の動き
+   - **高音域（50-100）**: 頭のボブと細かい動作
+3. **60FPS**でアニメーションループを更新
+4. 各棒人間が**個性に応じたダンススタイル**で反応
+
+## 🏗️ プロジェクト構造
+
+```
+src/
+├── App.jsx                 # メインアプリケーション
+├── App.css                 # メインスタイルシート
+├── components/
+│   ├── AudioControls.jsx   # 音声コントロール
+│   ├── AudioVisualizer.jsx # 音声ビジュアライザー
+│   ├── FigureControl.jsx   # 棒人間数制御
+│   ├── PersonalityControl.jsx # 個性バランス制御
+│   ├── SpeedControl.jsx    # アニメーション速度制御
+│   ├── StickFigureCanvas.jsx # メインキャンバス + 棒人間クラス
+│   ├── SyncControl.jsx     # 同期制御
+│   └── VideoRecorder.jsx   # 動画録画機能
+└── main.jsx                # エントリーポイント
+```
+
+## 🎭 ダンススタイル詳細
+
+各棒人間は5つの個性から構成され、音楽に応じて異なる動作を行います：
+
+- **🔥 ブレイカー**: アクロバティックな動きとフリーズポーズ
+- **🌊 ウェーバー**: 流れるようなウェーブモーション
+- **⚡ ジャンパー**: 大きなジャンプと躍動感ある動き
+- **🌀 スピナー**: 回転を中心とした動的な動作
+- **🎵 グルーバー**: リズミカルなグルーブとノリ
+
+## ❓ よくある質問
+
+### 🔒 **プライバシー・セキュリティ**
+
+**Q: 音楽ファイルはどこに保存されますか？**
+A: 音楽ファイルはサーバーに保存されません。ブラウザのメモリ内でのみ処理され、ページを閉じると完全に削除されます。
+
+**Q: 著作権のある音楽を使っても大丈夫ですか？**
+A: ファイルが外部に送信されることは一切ないため、個人的な利用であれば問題ありません。ただし、録画した動画を公開する際は著作権にご注意ください。
+
+**Q: インターネット接続は必要ですか？**
+A: 初回アクセス時のみ必要です。一度ページを開けば、オフラインでも動作します。
+
+### 🎵 **機能について**
+
+**Q: どんな音楽ファイルが使えますか？**
+A: MP3、WAV、M4A、OGG など、ブラウザが対応している音声フォーマットが使用できます。
+
+**Q: 動画はどのように保存されますか？**
+A: ブラウザ内でMP4またはWebM形式で生成され、直接ダウンロードされます。サーバーを経由しません。
+
+**Q: スマートフォンでも使えますか？**
+A: はい、モバイルブラウザでも動作しますが、PC環境での利用を推奨します。
+
+### 🛠️ **技術的な質問**
+
+**Q: なぜサーバーが不要なのですか？**
+A: Web Audio APIとCanvas APIを使用したクライアントサイド技術により、ブラウザ内で全ての処理が完結するためです。
+
+**Q: 大きな音楽ファイルでも大丈夫ですか？**
+A: ブラウザのメモリ制限内であれば処理可能ですが、極端に大きなファイル（数GB以上）は動作が重くなる場合があります。
+
+## 🚀 今後の展望
+
+- [ ] プリセット楽曲の追加
+- [ ] ダンスパターンのさらなる拡張
+- [ ] ソーシャル共有機能
+- [ ] モバイル最適化
+- [ ] リアルタイム音声入力対応
+
+## 📄 ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。
+
+## 📝 著作権
+
+© 2025 osamusic. All rights reserved.
+
+---
+
+<div align="center">
+
+**🎵 音楽と一緒に棒人間たちのダンスを楽しもう！ 🕺**
+
+Made with ❤️ using React + Vite by osamusic
+
+</div>

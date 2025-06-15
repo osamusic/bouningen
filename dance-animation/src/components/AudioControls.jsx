@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 function AudioControls({ setAudioContext, setAnalyser, setIsPlaying, isPlaying }) {
+  const { t } = useLanguage()
   const [audioBuffer, setAudioBuffer] = useState(null)
   const [fileName, setFileName] = useState('')
   const [volume, setVolume] = useState(50)
@@ -37,7 +39,7 @@ function AudioControls({ setAudioContext, setAnalyser, setIsPlaying, isPlaying }
       
     } catch (error) {
       console.error('Audio loading error:', error)
-      alert('音楽ファイルの読み込みに失敗しました')
+      alert(t('alertAudioError'))
     }
   }
 
@@ -80,6 +82,7 @@ function AudioControls({ setAudioContext, setAnalyser, setIsPlaying, isPlaying }
 
   return (
     <div className="audio-controls">
+      <h3>{t('audioControls')}</h3>
       <div className="file-input-wrapper">
         <input 
           type="file" 
@@ -87,8 +90,12 @@ function AudioControls({ setAudioContext, setAnalyser, setIsPlaying, isPlaying }
           onChange={handleFileUpload}
           id="audio-file"
         />
-        <label htmlFor="audio-file">
-          {fileName || '音楽ファイルを選択'}
+        <label htmlFor="audio-file" className="file-input-label">
+          <span className="file-icon">🎵</span>
+          <span className="file-text">
+            {fileName || t('selectMusic')}
+          </span>
+          <span className="file-hint">{t('fileHint')}</span>
         </label>
       </div>
       
@@ -96,21 +103,21 @@ function AudioControls({ setAudioContext, setAnalyser, setIsPlaying, isPlaying }
         <button 
           onClick={handlePlay} 
           disabled={!audioBuffer || isPlaying}
-          className="play-btn"
+          className="play-button"
         >
-          再生
+          {t('play')}
         </button>
         <button 
           onClick={handleStop} 
           disabled={!isPlaying}
-          className="stop-btn"
+          className="stop-button"
         >
-          停止
+          {t('stop')}
         </button>
       </div>
       
       <div className="volume-control">
-        <label htmlFor="volume">音量: {volume}%</label>
+        <label htmlFor="volume">{t('volume')}: {volume}%</label>
         <input 
           type="range" 
           id="volume"

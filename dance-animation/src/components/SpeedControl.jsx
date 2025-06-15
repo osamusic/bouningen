@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 function SpeedControl({ onSpeedChange, initialSpeed = 0.1 }) {
+  const { t } = useLanguage()
   const [speed, setSpeed] = useState(initialSpeed)
 
   const handleSpeedChange = (e) => {
@@ -10,10 +12,11 @@ function SpeedControl({ onSpeedChange, initialSpeed = 0.1 }) {
   }
 
   return (
-    <div className="speed-control">
-      <label htmlFor="speed-slider">アニメーション速度:</label>
+    <div className="control-panel speed-control">
+      <h3>{t('speed')}</h3>
+      <label htmlFor="speed-slider">{t('speedLabel')}</label>
       <div className="speed-slider-container">
-        <span>遅い</span>
+        <span>{t('slow')}</span>
         <input
           id="speed-slider"
           type="range"
@@ -24,10 +27,10 @@ function SpeedControl({ onSpeedChange, initialSpeed = 0.1 }) {
           onChange={handleSpeedChange}
           className="speed-slider"
         />
-        <span>速い</span>
+        <span>{t('fast')}</span>
       </div>
       <div className="speed-value">
-        速度: {speed.toFixed(1)}x
+        {t('speedValue')}: {speed.toFixed(1)}x
       </div>
     </div>
   )

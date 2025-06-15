@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 function FigureControl({ onFigureCountChange, initialCount = 1 }) {
+  const { t, language } = useLanguage()
   const [figureCount, setFigureCount] = useState(initialCount)
 
   const handleCountChange = (e) => {
@@ -10,10 +12,11 @@ function FigureControl({ onFigureCountChange, initialCount = 1 }) {
   }
 
   return (
-    <div className="figure-control">
-      <label htmlFor="figure-count-slider">棒人間の数:</label>
+    <div className="control-panel figure-control">
+      <h3>{t('figureCount')}</h3>
+      <label htmlFor="figure-count-slider">{t('figureCountLabel')}</label>
       <div className="figure-slider-container">
-        <span>1人</span>
+        <span>{language === 'ja' ? '1人' : '1'}</span>
         <input
           id="figure-count-slider"
           type="range"
@@ -24,10 +27,10 @@ function FigureControl({ onFigureCountChange, initialCount = 1 }) {
           onChange={handleCountChange}
           className="figure-slider"
         />
-        <span>100人</span>
+        <span>{language === 'ja' ? '100人' : '100'}</span>
       </div>
       <div className="figure-value">
-        {figureCount}人でダンス
+        {language === 'ja' ? `${figureCount}人でダンス` : `${figureCount} figures dancing`}
       </div>
     </div>
   )

@@ -1,12 +1,15 @@
 import { useState } from 'react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 function PersonalityControl({ onPersonalityBalanceChange, initialBalance }) {
+  const { t } = useLanguage()
+  const [isExpanded, setIsExpanded] = useState(false)
   const personalities = [
-    { id: 'breakdancer', name: 'ブレイカー', icon: '🔥', color: '#ef4444' },
-    { id: 'waver', name: 'ウェーバー', icon: '🌊', color: '#3b82f6' },
-    { id: 'jumper', name: 'ジャンパー', icon: '⚡', color: '#f59e0b' },
-    { id: 'spinner', name: 'スピナー', icon: '🌀', color: '#8b5cf6' },
-    { id: 'groover', name: 'グルーバー', icon: '🎵', color: '#10b981' }
+    { id: 'breakdancer', nameKey: 'breakdancer', icon: '🔥', color: '#ef4444' },
+    { id: 'waver', nameKey: 'waver', icon: '🌊', color: '#3b82f6' },
+    { id: 'jumper', nameKey: 'jumper', icon: '⚡', color: '#f59e0b' },
+    { id: 'spinner', nameKey: 'spinner', icon: '🌀', color: '#8b5cf6' },
+    { id: 'groover', nameKey: 'groover', icon: '🎵', color: '#10b981' }
   ]
 
   const [balance, setBalance] = useState(initialBalance || {
@@ -75,37 +78,46 @@ function PersonalityControl({ onPersonalityBalanceChange, initialBalance }) {
 
   return (
     <div className="personality-control">
-      <div className="personality-header">
-        <h3>個性バランス</h3>
-        <button onClick={resetBalance} className="reset-btn">リセット</button>
+      <div className="personality-header" onClick={() => setIsExpanded(!isExpanded)}>
+        <h3>{t('personalityControl')}</h3>
+        <div className="header-controls">
+          <span className="expand-indicator">{isExpanded ? '▲' : '▼'}</span>
+        </div>
       </div>
       
-      <div className="personality-sliders">
-        {personalities.map(personality => (
-          <div key={personality.id} className="personality-item">
-            <div className="personality-info">
-              <span className="personality-icon">{personality.icon}</span>
-              <span className="personality-name">{personality.name}</span>
-              <span className="personality-value">{balance[personality.id]}%</span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={balance[personality.id]}
-              onChange={(e) => handleSliderChange(personality.id, e.target.value)}
-              className="personality-slider"
-              style={{
-                '--slider-color': personality.color
-              }}
-            />
+      {isExpanded && (
+        <>
+          <div className="personality-sliders">
+            {personalities.map(personality => (
+              <div key={personality.id} className="personality-item">
+                <div className="personality-info">
+                  <span className="personality-icon">{personality.icon}</span>
+                  <span className="personality-name">{t(personality.nameKey)}</span>
+                  <span className="personality-value">{balance[personality.id]}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={balance[personality.id]}
+                  onChange={(e) => handleSliderChange(personality.id, e.target.value)}
+                  className="personality-slider"
+                  style={{
+                    '--slider-color': personality.color
+                  }}
+                />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      
-      <div className="personality-total">
-        合計: {Object.values(balance).reduce((sum, val) => sum + val, 0)}%
-      </div>
+          
+          <div className="personality-footer">
+            <div className="personality-total">
+              {t('total')}: {Object.values(balance).reduce((sum, val) => sum + val, 0)}%
+            </div>
+            <button onClick={resetBalance} className="reset-btn">{t('reset')}</button>
+          </div>
+        </>
+      )}
     </div>
   )
 }

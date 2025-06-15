@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, forwardRef } from 'react'
 
 class StickFigure {
   constructor(x, y, p, id = 0) {
@@ -74,7 +74,7 @@ class StickFigure {
     
     // Walking behavior (when not in sync mode)
     if (!isSync) {
-      this.updateWalking(speedMultiplier, bassFreq, midFreq)
+      this.updateWalking(speedMultiplier, bassFreq)
     }
     
     if (isSync) {
@@ -354,7 +354,7 @@ class StickFigure {
     this.bodyTilt = Math.sin(this.walkPhase) * intensity * 0.1
   }
 
-  updateWalking(speedMultiplier, bassFreq, midFreq) {
+  updateWalking(speedMultiplier, bassFreq) {
     // Random walking behavior
     if (this.walkTimer > 3 + Math.random() * 4) {
       // Decide whether to start/stop walking
@@ -897,7 +897,7 @@ class StickFigure {
   }
 }
 
-function StickFigureCanvas({ audioData, animationSpeed = 1.0, figureCount = 1, isSync = false, personalityBalance, isDarkMode = false, backgroundPattern = 'default' }) {
+const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureCount = 1, isSync = false, personalityBalance, isDarkMode = false, backgroundPattern = 'default', aspectRatio = '16:9' }, ref) => {
   const canvasRef = useRef(null)
   const stickFiguresRef = useRef([])
   const p5InstanceRef = useRef(null)
@@ -910,21 +910,41 @@ function StickFigureCanvas({ audioData, animationSpeed = 1.0, figureCount = 1, i
 
   useEffect(() => {
     const canvas = canvasRef.current
+    if (!canvas) return
+    
     const ctx = canvas.getContext('2d')
     
-    // Dynamic canvas size based on figure count
-    if (figureCount <= 8) {
-      canvas.width = 800
-      canvas.height = 400
-    } else if (figureCount <= 20) {
-      canvas.width = 1200
-      canvas.height = 500
-    } else if (figureCount <= 50) {
-      canvas.width = 1600
-      canvas.height = 600
+    // Dynamic canvas size based on figure count and aspect ratio
+    if (aspectRatio === '9:16') {
+      // Vertical aspect ratio (9:16)
+      if (figureCount <= 8) {
+        canvas.width = 450
+        canvas.height = 800
+      } else if (figureCount <= 20) {
+        canvas.width = 562
+        canvas.height = 1000
+      } else if (figureCount <= 50) {
+        canvas.width = 675
+        canvas.height = 1200
+      } else {
+        canvas.width = 720
+        canvas.height = 1280
+      }
     } else {
-      canvas.width = 2000
-      canvas.height = 800
+      // Horizontal aspect ratio (16:9)
+      if (figureCount <= 8) {
+        canvas.width = 800
+        canvas.height = 400
+      } else if (figureCount <= 20) {
+        canvas.width = 1200
+        canvas.height = 500
+      } else if (figureCount <= 50) {
+        canvas.width = 1600
+        canvas.height = 600
+      } else {
+        canvas.width = 2000
+        canvas.height = 800
+      }
     }
     
     // Create a mock p5 instance for helper functions
@@ -1031,6 +1051,21 @@ function StickFigureCanvas({ audioData, animationSpeed = 1.0, figureCount = 1, i
           break
         case 'waves':
           renderWavesBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
+          break
+        case 'clouds':
+          renderCloudsBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
+          break
+        case 'neon':
+          renderNeonBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time)
+          break
+        case 'matrix':
+          renderMatrixBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time)
+          break
+        case 'rainbow':
+          renderRainbowBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
+          break
+        case 'fire':
+          renderFireBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time)
           break
         default:
           renderDefaultBackground(ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode)
@@ -1357,6 +1392,238 @@ function StickFigureCanvas({ audioData, animationSpeed = 1.0, figureCount = 1, i
       }
     }
     
+    const renderCloudsBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode) => {
+      // Sky gradient
+      const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+      if (isDarkMode) {
+        skyGradient.addColorStop(0, '#0a0a1a')
+        skyGradient.addColorStop(0.5, '#1a1a3a')
+        skyGradient.addColorStop(1, '#2a2a4a')
+      } else {
+        skyGradient.addColorStop(0, '#87CEEB')
+        skyGradient.addColorStop(0.5, '#98D8E8')
+        skyGradient.addColorStop(1, '#B0E0E6')
+      }
+      ctx.fillStyle = skyGradient
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Clouds
+      const cloudCount = 8 + Math.floor(bassFreq * 5)
+      for (let i = 0; i < cloudCount; i++) {
+        ctx.save()
+        const x = ((time * 10 + i * 100) % (canvas.width + 300)) - 150
+        const y = 50 + i * 60 + Math.sin(time * 0.5 + i) * 20
+        const scale = 0.8 + Math.sin(i) * 0.4
+        
+        ctx.translate(x, y)
+        ctx.scale(scale, scale)
+        
+        // Cloud puffs
+        const alpha = isDarkMode ? 0.3 + midFreq * 0.3 : 0.8 + midFreq * 0.2
+        ctx.fillStyle = isDarkMode 
+          ? `rgba(100, 100, 120, ${alpha})`
+          : `rgba(255, 255, 255, ${alpha})`
+        
+        for (let j = 0; j < 5; j++) {
+          const puffX = Math.cos(j * 1.2) * 30
+          const puffY = Math.sin(j * 0.8) * 15
+          const puffSize = 40 + Math.sin(time * 2 + j) * 10 + bassFreq * 20
+          
+          ctx.beginPath()
+          ctx.arc(puffX, puffY, puffSize, 0, Math.PI * 2)
+          ctx.fill()
+        }
+        
+        ctx.restore()
+      }
+    }
+    
+    const renderNeonBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time) => {
+      // Dark background
+      ctx.fillStyle = '#0a0a0a'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Neon grid
+      ctx.strokeStyle = `rgba(0, 255, 255, ${0.3 + highFreq * 0.7})`
+      ctx.lineWidth = 2
+      ctx.shadowBlur = 10 + bassFreq * 20
+      ctx.shadowColor = '#00ffff'
+      
+      const gridSize = 50
+      for (let x = 0; x < canvas.width; x += gridSize) {
+        ctx.beginPath()
+        ctx.moveTo(x, 0)
+        ctx.lineTo(x, canvas.height)
+        ctx.stroke()
+      }
+      
+      for (let y = 0; y < canvas.height; y += gridSize) {
+        ctx.beginPath()
+        ctx.moveTo(0, y)
+        ctx.lineTo(canvas.width, y)
+        ctx.stroke()
+      }
+      
+      // Neon shapes
+      const shapeCount = 5 + Math.floor(midFreq * 10)
+      for (let i = 0; i < shapeCount; i++) {
+        const hue = (time * 50 + i * 60) % 360
+        ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${0.5 + totalEnergy * 0.5})`
+        ctx.shadowColor = `hsl(${hue}, 100%, 50%)`
+        ctx.shadowBlur = 20 + bassFreq * 30
+        ctx.lineWidth = 3
+        
+        const x = (canvas.width / shapeCount) * i + canvas.width / (shapeCount * 2)
+        const y = canvas.height / 2 + Math.sin(time * 2 + i) * 100
+        const size = 30 + totalEnergy * 50
+        
+        ctx.beginPath()
+        if (i % 3 === 0) {
+          ctx.rect(x - size/2, y - size/2, size, size)
+        } else if (i % 3 === 1) {
+          ctx.arc(x, y, size/2, 0, Math.PI * 2)
+        } else {
+          ctx.moveTo(x, y - size/2)
+          ctx.lineTo(x + size/2, y + size/2)
+          ctx.lineTo(x - size/2, y + size/2)
+          ctx.closePath()
+        }
+        ctx.stroke()
+      }
+      
+      ctx.shadowBlur = 0
+    }
+    
+    const renderMatrixBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time) => {
+      // Black background with green tint
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Matrix rain
+      ctx.font = '14px monospace'
+      const chars = '01アイウエオカキクケコサシスセソタチツテト'
+      const columnWidth = 20
+      const columns = Math.floor(canvas.width / columnWidth)
+      
+      for (let i = 0; i < columns; i++) {
+        const x = i * columnWidth
+        // const charIndex = Math.floor(Math.random() * chars.length)
+        const y = ((time * 100 + i * 50) % canvas.height)
+        
+        // Trail effect
+        for (let j = 0; j < 10; j++) {
+          const trailY = y - j * 20
+          const alpha = (1 - j / 10) * (0.5 + bassFreq * 0.5)
+          ctx.fillStyle = `rgba(0, 255, 0, ${alpha})`
+          
+          if (trailY > 0 && trailY < canvas.height) {
+            ctx.fillText(chars[Math.floor(Math.random() * chars.length)], x, trailY)
+          }
+        }
+      }
+    }
+    
+    const renderRainbowBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time, isDarkMode) => {
+      // Base color
+      ctx.fillStyle = isDarkMode ? '#0a0a0a' : '#fafafa'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Rainbow waves
+      const waveCount = 7
+      for (let i = 0; i < waveCount; i++) {
+        const hue = (i * 360 / waveCount + time * 30) % 360
+        const alpha = 0.3 + totalEnergy * 0.4
+        
+        ctx.fillStyle = `hsla(${hue}, 80%, 50%, ${alpha})`
+        ctx.beginPath()
+        ctx.moveTo(0, canvas.height)
+        
+        for (let x = 0; x <= canvas.width; x += 5) {
+          const waveHeight = Math.sin((x + time * 50) * 0.01 + i) * 50 * (1 + bassFreq)
+          const y = canvas.height * (0.3 + i * 0.1) + waveHeight
+          ctx.lineTo(x, y)
+        }
+        
+        ctx.lineTo(canvas.width, canvas.height)
+        ctx.closePath()
+        ctx.fill()
+      }
+      
+      // Rainbow particles
+      const particleCount = Math.floor(20 + midFreq * 30)
+      for (let i = 0; i < particleCount; i++) {
+        const x = Math.random() * canvas.width
+        const y = (time * 50 + i * 30) % canvas.height
+        const hue = (x / canvas.width * 360 + time * 50) % 360
+        const size = 2 + highFreq * 8
+        
+        ctx.fillStyle = `hsla(${hue}, 100%, 50%, ${0.8})`
+        ctx.beginPath()
+        ctx.arc(x, y, size, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
+    
+    const renderFireBackground = (ctx, canvas, bassFreq, midFreq, highFreq, totalEnergy, time) => {
+      // Dark background
+      ctx.fillStyle = '#0a0000'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      // Fire particles
+      const particleCount = 100 + Math.floor(bassFreq * 100)
+      
+      for (let i = 0; i < particleCount; i++) {
+        const x = Math.random() * canvas.width
+        const baseY = canvas.height
+        const y = baseY - ((time * 100 + i * 10) % (canvas.height * 0.8))
+        const size = Math.random() * 10 + bassFreq * 20
+        
+        // Fire colors based on height
+        const heightRatio = (baseY - y) / canvas.height
+        let r, g, b, a
+        
+        if (heightRatio < 0.3) {
+          // Base - white/yellow
+          r = 255
+          g = 200 + Math.random() * 55
+          b = 100 + Math.random() * 50
+          a = 0.8
+        } else if (heightRatio < 0.6) {
+          // Middle - orange
+          r = 255
+          g = 100 + Math.random() * 100
+          b = 0
+          a = 0.6
+        } else {
+          // Top - red/dark
+          r = 150 + Math.random() * 105
+          g = 0
+          b = 0
+          a = 0.3
+        }
+        
+        // Wave effect
+        const waveX = x + Math.sin(y * 0.02 + time) * 20 * heightRatio
+        
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a * (1 - heightRatio)})`
+        ctx.beginPath()
+        ctx.arc(waveX, y, size * (1 - heightRatio * 0.7), 0, Math.PI * 2)
+        ctx.fill()
+      }
+      
+      // Glow effect
+      const glowGradient = ctx.createRadialGradient(
+        canvas.width / 2, canvas.height, 0,
+        canvas.width / 2, canvas.height, canvas.height * 0.8
+      )
+      glowGradient.addColorStop(0, `rgba(255, 100, 0, ${0.3 + bassFreq * 0.3})`)
+      glowGradient.addColorStop(0.5, `rgba(255, 50, 0, ${0.1 + bassFreq * 0.1})`)
+      glowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      
+      ctx.fillStyle = glowGradient
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }
+    
     renderBackground()
     
     // Default pattern includes gradient overlay for non-default patterns
@@ -1522,14 +1789,25 @@ function StickFigureCanvas({ audioData, animationSpeed = 1.0, figureCount = 1, i
       figure.draw(ctx)
     })
     
-  }, [audioData, animationSpeed, figureCount, isSync, personalityBalance, isDarkMode, backgroundPattern])
+  }, [audioData, animationSpeed, figureCount, isSync, personalityBalance, isDarkMode, backgroundPattern, aspectRatio])
 
   return (
     <canvas 
-      ref={canvasRef}
+      ref={(element) => {
+        canvasRef.current = element
+        if (ref) {
+          if (typeof ref === 'function') {
+            ref(element)
+          } else {
+            ref.current = element
+          }
+        }
+      }}
       className="stick-figure-canvas"
     />
   )
-}
+})
+
+StickFigureCanvas.displayName = 'StickFigureCanvas'
 
 export default StickFigureCanvas

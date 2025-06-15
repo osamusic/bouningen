@@ -7,8 +7,11 @@ import SpeedControl from './components/SpeedControl'
 import FigureControl from './components/FigureControl'
 import SyncControl from './components/SyncControl'
 import PersonalityControl from './components/PersonalityControl'
+import VideoRecorder from './components/VideoRecorder'
+import { useLanguage } from './contexts/LanguageContext'
 
 function App() {
+  const { t, language, changeLanguage } = useLanguage()
   const [_audioContext, setAudioContext] = useState(null)
   const [analyser, setAnalyser] = useState(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -25,7 +28,9 @@ function App() {
   })
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [backgroundPattern, setBackgroundPattern] = useState('default')
+  const [aspectRatio, setAspectRatio] = useState('16:9')
   const animationRef = useRef()
+  const canvasRef = useRef()
 
   useEffect(() => {
     if (analyser && isPlaying) {
@@ -49,11 +54,56 @@ function App() {
 
   return (
     <div className={`app ${isDarkMode ? 'dark-mode' : ''}`}>
-      <header>
-        <h1>棒人間ダンスアニメーション</h1>
+      <header className="dansabo-header">
+        <div className="logo-container">
+          <div className="logo">
+            <div className="stick-figure-logo">
+              <div className="stick-head"></div>
+              <div className="stick-body"></div>
+              <div className="stick-arm stick-arm-left"></div>
+              <div className="stick-arm stick-arm-right"></div>
+              <div className="stick-leg stick-leg-left"></div>
+              <div className="stick-leg stick-leg-right"></div>
+            </div>
+            <h1 className="logo-text">
+              <span className="logo-main">{t('appTitle')}</span>
+              <span className="logo-sub">{t('appSubtitle')}</span>
+            </h1>
+          </div>
+          <div className="header-decoration">
+            <div className="language-selector">
+              <select 
+                value={language} 
+                onChange={(e) => changeLanguage(e.target.value)}
+                className="language-select"
+              >
+                <option value="ja">🇯🇵 日本語</option>
+                <option value="en">🇺🇸 English</option>
+              </select>
+            </div>
+            <span className="music-note">♪</span>
+            <span className="music-note">♫</span>
+            <span className="music-note">♪</span>
+          </div>
+        </div>
       </header>
       
       <main>
+        <div className="canvas-container">
+          <StickFigureCanvas 
+            ref={canvasRef}
+            audioData={audioData} 
+            animationSpeed={animationSpeed}
+            figureCount={figureCount}
+            isSync={isSync}
+            personalityBalance={personalityBalance}
+            isDarkMode={isDarkMode}
+            backgroundPattern={backgroundPattern}
+            aspectRatio={aspectRatio}
+          />
+          <AudioVisualizer audioData={audioData} />
+        </div>
+
         <AudioControls 
           setAudioContext={setAudioContext}
           setAnalyser={setAnalyser}
@@ -79,28 +129,33 @@ function App() {
           
           {/* Display Controls */}
           <div className="control-panel">
-            <h3>🌙 Display</h3>
+            <h3>{t('display')}</h3>
             <label className="control-item">
               <input
                 type="checkbox"
                 checked={isDarkMode}
                 onChange={(e) => setIsDarkMode(e.target.checked)}
               />
-              Dark Mode
+              {t('darkMode')}
             </label>
             
             <div className="background-selector">
-              <label htmlFor="background-pattern">Background:</label>
+              <label htmlFor="background-pattern">{t('background')}</label>
               <select
                 id="background-pattern"
                 value={backgroundPattern}
                 onChange={(e) => setBackgroundPattern(e.target.value)}
               >
-                <option value="default">Default</option>
-                <option value="cosmic">🌌 Cosmic</option>
-                <option value="dreamlike">💫 Dreamlike</option>
-                <option value="geometric">🔷 Geometric</option>
-                <option value="waves">🌊 Waves</option>
+                <option value="default">{t('bgDefault')}</option>
+                <option value="cosmic">{t('bgCosmic')}</option>
+                <option value="dreamlike">{t('bgDreamlike')}</option>
+                <option value="geometric">{t('bgGeometric')}</option>
+                <option value="waves">{t('bgWaves')}</option>
+                <option value="clouds">{t('bgClouds')}</option>
+                <option value="neon">{t('bgNeon')}</option>
+                <option value="matrix">{t('bgMatrix')}</option>
+                <option value="rainbow">{t('bgRainbow')}</option>
+                <option value="fire">{t('bgFire')}</option>
               </select>
             </div>
           </div>
@@ -111,19 +166,20 @@ function App() {
           initialBalance={personalityBalance}
         />
         
-        <div className="canvas-container">
-          <StickFigureCanvas 
-            audioData={audioData} 
-            animationSpeed={animationSpeed}
-            figureCount={figureCount}
-            isSync={isSync}
-            personalityBalance={personalityBalance}
-            isDarkMode={isDarkMode}
-            backgroundPattern={backgroundPattern}
-          />
-          <AudioVisualizer audioData={audioData} />
-        </div>
+        <VideoRecorder 
+          canvasRef={canvasRef}
+          isPlaying={isPlaying}
+          aspectRatio={aspectRatio}
+          onAspectRatioChange={setAspectRatio}
+        />
       </main>
+      
+      <footer className="app-footer">
+        <div className="footer-content">
+          <p className="copyright">{t('copyright')}</p>
+          <p className="footer-description">{t('footerDesc')}</p>
+        </div>
+      </footer>
     </div>
   )
 }

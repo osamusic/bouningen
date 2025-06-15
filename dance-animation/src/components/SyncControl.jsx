@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 function SyncControl({ onSyncChange, initialSync = false }) {
+  const { t } = useLanguage()
   const [isSync, setIsSync] = useState(initialSync)
 
   const handleSyncChange = (e) => {
@@ -10,7 +12,8 @@ function SyncControl({ onSyncChange, initialSync = false }) {
   }
 
   return (
-    <div className="sync-control">
+    <div className="control-panel sync-control">
+      <h3>{t('sync')}</h3>
       <label htmlFor="sync-toggle" className="sync-label">
         <input
           id="sync-toggle"
@@ -21,14 +24,11 @@ function SyncControl({ onSyncChange, initialSync = false }) {
         />
         <span className="sync-slider"></span>
         <span className="sync-text">
-          {isSync ? 'Manual Sync' : 'Auto Sync'}
+          {isSync ? t('syncOn') : t('syncOff')}
         </span>
       </label>
       <div className="sync-description">
-        {isSync 
-          ? 'Always synchronized dancing' 
-          : 'Auto-sync on beat drops & high energy'
-        }
+        {isSync ? t('syncOnDesc') : t('syncOffDesc')}
       </div>
     </div>
   )
