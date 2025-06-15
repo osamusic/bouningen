@@ -490,7 +490,7 @@ class StickFigure {
     this.trailPositions.forEach((pos) => {
       ctx.save()
       ctx.globalAlpha = pos.alpha / 255
-      ctx.fillStyle = `hsl(${(this.dancePhase * 50) % 360}, 70%, 60%)`
+      ctx.fillStyle = `hsl(${this.colorHue}, 70%, 60%)`
       ctx.beginPath()
       ctx.arc(pos.x, pos.y - 50, 3, 0, Math.PI * 2)
       ctx.fill()
@@ -502,7 +502,7 @@ class StickFigure {
       this.particles.forEach(particle => {
         ctx.save()
         ctx.globalAlpha = particle.life / 255
-        ctx.fillStyle = `hsl(${(this.dancePhase * 100) % 360}, 80%, 70%)`
+        ctx.fillStyle = `hsl(${this.colorHue}, 80%, 70%)`
         ctx.beginPath()
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
         ctx.fill()
@@ -533,18 +533,18 @@ class StickFigure {
     
     switch (this.danceStyle) {
       case 'energetic':
-        strokeColor = `hsl(${(this.colorHue + this.dancePhase * 30) % 360}, 80%, 40%)`
-        headColor = `hsl(${(this.colorHue + this.dancePhase * 30) % 360}, 60%, 90%)`
+        strokeColor = `hsl(${this.colorHue}, 80%, 40%)`
+        headColor = `hsl(${this.colorHue}, 60%, 90%)`
         lineWidth = 6 * this.sizeVariation
         break
       case 'groove':
-        strokeColor = `hsl(${(this.colorHue + this.dancePhase * 20) % 360}, 60%, 50%)`
-        headColor = `hsl(${(this.colorHue + this.dancePhase * 20) % 360}, 40%, 85%)`
+        strokeColor = `hsl(${this.colorHue}, 60%, 50%)`
+        headColor = `hsl(${this.colorHue}, 40%, 85%)`
         lineWidth = 5 * this.sizeVariation
         break
       case 'smooth':
-        strokeColor = `hsl(${(this.colorHue + this.dancePhase * 10) % 360}, 40%, 60%)`
-        headColor = `hsl(${(this.colorHue + this.dancePhase * 10) % 360}, 30%, 95%)`
+        strokeColor = `hsl(${this.colorHue}, 40%, 60%)`
+        headColor = `hsl(${this.colorHue}, 30%, 95%)`
         lineWidth = 3 * this.sizeVariation
         break
       default:
