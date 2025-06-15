@@ -46,6 +46,9 @@ const getTrianglePosition = (index, total, centerX, centerY, canvas) => {
   const rows = Math.ceil(Math.sqrt(total * 2))
   let currentIndex = 0
   
+  // Adjust centerY for 6-9 people to be even lower
+  const adjustedCenterY = total >= 6 && total <= 9 ? centerY + 40 : centerY
+  
   for (let row = 0; row < rows; row++) {
     const figuresInRow = Math.min(row + 1, total - currentIndex)
     if (index >= currentIndex && index < currentIndex + figuresInRow) {
@@ -55,20 +58,23 @@ const getTrianglePosition = (index, total, centerX, centerY, canvas) => {
       
       return {
         x: figuresInRow === 1 ? centerX : startX + posInRow * rowSpacing,
-        y: centerY - (rows - row - 1) * 60 + (canvas.height * 0.05)
+        y: adjustedCenterY - (rows - row - 1) * 60 + (canvas.height * 0.05)
       }
     }
     currentIndex += figuresInRow
     if (currentIndex >= total) break
   }
   
-  return { x: centerX, y: centerY }
+  return { x: centerX, y: adjustedCenterY }
 }
 
 const getInvertedTrianglePosition = (index, total, centerX, centerY, canvas) => {
   // Create inverted triangle formation with more figures at the top
   const rows = Math.ceil(Math.sqrt(total * 2))
   let currentIndex = 0
+  
+  // Adjust centerY for 7-9 people to be even lower
+  const adjustedCenterY = total >= 7 && total <= 9 ? centerY + 40 : centerY
   
   for (let row = 0; row < rows; row++) {
     const figuresInRow = Math.max(1, Math.min(rows - row, total - currentIndex))
@@ -79,14 +85,14 @@ const getInvertedTrianglePosition = (index, total, centerX, centerY, canvas) => 
       
       return {
         x: figuresInRow === 1 ? centerX : startX + posInRow * rowSpacing,
-        y: centerY - (rows - row - 1) * 60 + (canvas.height * 0.05)
+        y: adjustedCenterY - (rows - row - 1) * 60 + (canvas.height * 0.05)
       }
     }
     currentIndex += figuresInRow
     if (currentIndex >= total) break
   }
   
-  return { x: centerX, y: centerY }
+  return { x: centerX, y: adjustedCenterY }
 }
 
 const getDiamondPosition = (index, total, centerX, centerY, canvas) => {
