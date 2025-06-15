@@ -55,7 +55,7 @@ const getTrianglePosition = (index, total, centerX, centerY, canvas) => {
       
       return {
         x: figuresInRow === 1 ? centerX : startX + posInRow * rowSpacing,
-        y: centerY - (rows - row - 1) * 80 + (canvas.height * 0.1)
+        y: centerY - (rows - row - 1) * 60 + (canvas.height * 0.05)
       }
     }
     currentIndex += figuresInRow
@@ -79,7 +79,7 @@ const getInvertedTrianglePosition = (index, total, centerX, centerY, canvas) => 
       
       return {
         x: figuresInRow === 1 ? centerX : startX + posInRow * rowSpacing,
-        y: centerY - (rows - row - 1) * 80 + (canvas.height * 0.1)
+        y: centerY - (rows - row - 1) * 60 + (canvas.height * 0.05)
       }
     }
     currentIndex += figuresInRow
@@ -95,10 +95,10 @@ const getDiamondPosition = (index, total, centerX, centerY, canvas) => {
   
   if (index < halfTotal) {
     // Top half (triangle)
-    return getTrianglePosition(index, halfTotal, centerX, centerY - 60, canvas)
+    return getTrianglePosition(index, halfTotal, centerX, centerY - 40, canvas)
   } else {
     // Bottom half (inverted triangle)
-    return getInvertedTrianglePosition(index - halfTotal, total - halfTotal, centerX, centerY + 60, canvas)
+    return getInvertedTrianglePosition(index - halfTotal, total - halfTotal, centerX, centerY + 40, canvas)
   }
 }
 
