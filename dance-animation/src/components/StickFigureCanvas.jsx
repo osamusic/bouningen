@@ -993,7 +993,12 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
           // Single row for small groups
           const spacing = canvas.width / (figureCount + 1)
           x = spacing * (i + 1)
-          y = canvas.height * 0.55 // Moved down slightly from 0.45
+          // Adjust y position based on aspect ratio
+          if (aspectRatio === '9:16') {
+            y = canvas.height * 0.75 // Lower for vertical format
+          } else {
+            y = canvas.height * 0.55 // Original for horizontal
+          }
         } else {
           // Multiple rows for larger groups
           const cols = Math.ceil(Math.sqrt(figureCount * (canvas.width / canvas.height)))
@@ -1006,7 +1011,12 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
           const spacingY = canvas.height / (rows + 1)
           
           x = spacingX * (col + 1)
-          y = spacingY * (row + 1) + canvas.height * 0.08 // Moved down slightly from 0.05
+          // Adjust y position based on aspect ratio
+          if (aspectRatio === '9:16') {
+            y = spacingY * (row + 1) + canvas.height * 0.25 // Start lower for vertical format
+          } else {
+            y = spacingY * (row + 1) + canvas.height * 0.08 // Original for horizontal
+          }
         }
         
         // Select personality based on distribution
