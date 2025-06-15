@@ -555,10 +555,10 @@ class StickFigure {
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
     
-    const headRadius = (25 + this.stretchPhase * 5) * this.sizeVariation
-    const bodyLength = (70 + this.stretchPhase * 10) * this.sizeVariation
-    const armLength = (50 + this.stretchPhase * 8) * this.sizeVariation
-    const legLength = (60 + this.stretchPhase * 12) * this.sizeVariation
+    const headRadius = Math.max(5, (25 + this.stretchPhase * 5) * this.sizeVariation)
+    const bodyLength = Math.max(10, (70 + this.stretchPhase * 10) * this.sizeVariation)
+    const armLength = Math.max(10, (50 + this.stretchPhase * 8) * this.sizeVariation)
+    const legLength = Math.max(10, (60 + this.stretchPhase * 12) * this.sizeVariation)
     
     const currentY = this.baseY - this.bounce
     const hipX = this.x + this.hipSwing + this.swayPhase
@@ -787,7 +787,7 @@ class StickFigure {
     ctx.save()
     ctx.lineWidth = 2
     
-    const gestureSize = 8 * this.sizeVariation
+    const gestureSize = Math.max(2, 8 * this.sizeVariation)
     
     switch (gesture) {
       case 'clap':
@@ -1211,7 +1211,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
       for (let i = 0; i < bubbleCount; i++) {
         const x = (time * 15 + i * 77) % (canvas.width + 100) - 50
         const y = Math.sin(time * 0.7 + i * 0.5) * (canvas.height * 0.3) + canvas.height / 2
-        const size = 20 + Math.sin(time * 2 + i) * 15 + midFreq * 30
+        const size = Math.max(5, 20 + Math.sin(time * 2 + i) * 15 + midFreq * 30)
         
         const bubbleGradient = ctx.createRadialGradient(x, y, 0, x, y, size)
         bubbleGradient.addColorStop(0, `hsla(${baseHue + i * 40}, 60%, 80%, 0.3)`)
@@ -1427,7 +1427,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         for (let j = 0; j < 5; j++) {
           const puffX = Math.cos(j * 1.2) * 30
           const puffY = Math.sin(j * 0.8) * 15
-          const puffSize = 40 + Math.sin(time * 2 + j) * 10 + bassFreq * 20
+          const puffSize = Math.max(10, 40 + Math.sin(time * 2 + j) * 10 + bassFreq * 20)
           
           ctx.beginPath()
           ctx.arc(puffX, puffY, puffSize, 0, Math.PI * 2)
