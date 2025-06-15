@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `cd dance-animation && npm run build` - Build for production
 - `cd dance-animation && npm run preview` - Preview production build
 - `cd dance-animation && npm run lint` - Run ESLint
+- `cd dance-animation && npm run typecheck` - Run TypeScript type checking
 
 ### Testing
 This project currently has no test setup configured.

@@ -961,7 +961,9 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
     }
     
     // Create or update stick figures based on figureCount and personality balance
-    const needsRecreation = stickFiguresRef.current.length !== figureCount
+    const needsRecreation = stickFiguresRef.current.length !== figureCount || 
+                            !stickFiguresRef.current[0] || 
+                            (stickFiguresRef.current[0] && stickFiguresRef.current[0].aspectRatio !== aspectRatio)
     if (needsRecreation) {
       stickFiguresRef.current = []
       
@@ -993,10 +995,12 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
           // Single row for small groups
           const spacing = canvas.width / (figureCount + 1)
           x = spacing * (i + 1)
-          // Adjust y position based on aspect ratio
+          
           if (aspectRatio === '9:16') {
-            y = canvas.height * 0.75 // Lower for vertical format
+            // For vertical format, account for drawing offsets (head drawn ~95px above baseY)
+            y = canvas.height * 0.85 // Much lower to account for upward drawing offset
           } else {
+            // For horizontal format
             y = canvas.height * 0.55 // Original for horizontal
           }
         } else {
@@ -1011,10 +1015,12 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
           const spacingY = canvas.height / (rows + 1)
           
           x = spacingX * (col + 1)
-          // Adjust y position based on aspect ratio
+          
           if (aspectRatio === '9:16') {
-            y = spacingY * (row + 1) + canvas.height * 0.25 // Start lower for vertical format
+            // For vertical format, account for drawing offsets
+            y = spacingY * (row + 1) + canvas.height * 0.5 // Start much lower for vertical format
           } else {
+            // For horizontal format
             y = spacingY * (row + 1) + canvas.height * 0.08 // Original for horizontal
           }
         }
@@ -1025,6 +1031,7 @@ const StickFigureCanvas = forwardRef(({ audioData, animationSpeed = 1.0, figureC
         
         const figure = new StickFigure(x, y, p5InstanceRef.current, i)
         figure.personality = selectedPersonality
+        figure.aspectRatio = aspectRatio // Store aspect ratio for change detection
         
         // Set walking boundaries based on canvas size
         figure.boundaryLeft = 50
